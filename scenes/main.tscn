@@ -34,6 +34,7 @@ script = ExtResource("9_body_switcher")
 [node name="Snake" parent="World/bodies" unique_id=1145853825 instance=ExtResource("8_snake")]
 body_render_mode = 1
 outline_mode = 1
+debug_chain = true
 
 [node name="Fish" parent="World/bodies" unique_id=1504660315 instance=ExtResource("10_fish")]
 
