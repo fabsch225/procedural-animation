@@ -2,6 +2,7 @@
 .godot/
 /android/
 /addons/
+/_exports/
 /native/non_zero_tessellator/godot-cpp/
 /native/non_zero_tessellator/.sconsign.dblite
 /native/non_zero_tessellator/bin/*.exp
