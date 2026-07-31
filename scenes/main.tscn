@@ -116,6 +116,7 @@ anchor_right = 1.0
 offset_left = -100.0
 offset_bottom = 100.0
 grow_horizontal = 0
+mouse_default_cursor_shape = 2
 texture = ExtResource("12_eb6dy")
 
 [node name="DebugPanel" type="PanelContainer" parent="Pause" unique_id=955231251]

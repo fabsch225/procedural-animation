@@ -8,6 +8,7 @@ const EXIT_FULLSCREEN_ICON: Texture2D = preload("res://ui/icons/2x/smaller.png")
 @export var hide_mouse_cursor: bool = false
 
 @onready var pause_layer: CanvasLayer = $Pause
+@onready var pause_indicator: TextureRect = $Pause/pause
 @onready var pause_debug_panel: Control = $Pause/DebugPanel
 @onready var debug_chain_toggle: CheckButton = $Pause/DebugPanel/Margin/Options/DebugChain
 @onready var ui_bounds_toggle: CheckButton = $Pause/DebugPanel/Margin/Options/UIBounds
@@ -31,6 +32,7 @@ func _ready() -> void:
 	if not _is_fullscreen():
 		_windowed_mode_before_fullscreen = DisplayServer.window_get_mode()
 	_update_fullscreen_button()
+	pause_indicator.tooltip_text = _with_action_hotkey("Unpause", &"pause")
 	Input.mouse_mode = (
 		Input.MOUSE_MODE_HIDDEN
 		if hide_mouse_cursor
@@ -52,7 +54,10 @@ func _input(event: InputEvent) -> void:
 			consume_input()
 			get_tree().paused = false
 			get_tree().reload_current_scene()
-		elif event.keycode == KEY_ESCAPE and event.pressed and not event.echo:
+		elif event.is_action_pressed(&"fullscreen") and not event.echo:
+			_on_fullscreen_button_pressed()
+			consume_input()
+		elif event.is_action_pressed(&"pause") and not event.echo:
 			toggle_pause()
 			consume_input()
 
@@ -97,7 +102,26 @@ func _update_fullscreen_button() -> void:
 	fullscreen_button.texture_normal = icon
 	fullscreen_button.texture_hover = icon
 	fullscreen_button.texture_pressed = icon
-	fullscreen_button.tooltip_text = "Exit fullscreen" if fullscreen else "Enter fullscreen"
+	var action_text := "Exit fullscreen" if fullscreen else "Enter fullscreen"
+	fullscreen_button.tooltip_text = _with_action_hotkey(action_text, &"fullscreen")
+
+
+func _with_action_hotkey(label: String, action: StringName) -> String:
+	var hotkey := _get_action_hotkey_text(action)
+	return label if hotkey.is_empty() else "%s (%s)" % [label, hotkey]
+
+
+func _get_action_hotkey_text(action: StringName) -> String:
+	var labels := PackedStringArray()
+	for input_event in InputMap.action_get_events(action):
+		var event_label := ""
+		if input_event is InputEventKey:
+			event_label = (input_event as InputEventKey).as_text_keycode()
+		else:
+			event_label = input_event.as_text()
+		if not event_label.is_empty() and event_label not in labels:
+			labels.append(event_label)
+	return " / ".join(labels)
 
 
 func _is_fullscreen() -> bool:
