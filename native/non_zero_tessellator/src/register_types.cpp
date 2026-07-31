@@ -1,5 +1,6 @@
 #include "register_types.h"
 
+#include "cubic_stroke_tessellator_native.h"
 #include "non_zero_path_tessellator_native.h"
 
 #include <gdextension_interface.h>
@@ -13,6 +14,7 @@ void initialize_non_zero_tessellator_module(ModuleInitializationLevel p_level) {
 		return;
 	}
 	GDREGISTER_CLASS(NonZeroPathTessellatorNative);
+	GDREGISTER_CLASS(CubicStrokeTessellatorNative);
 }
 
 void uninitialize_non_zero_tessellator_module(ModuleInitializationLevel p_level) {

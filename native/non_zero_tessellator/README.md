@@ -1,8 +1,9 @@
-# Native non-zero path tessellator
+# Native Processing-style geometry helpers
 
-This GDExtension implements scanbeam `NON_ZERO` winding tessellation in C++
-through the official `godot-cpp` bindings. It supports the self-intersecting
-Processing-style path used by the snake.
+This GDExtension implements scanbeam `NON_ZERO` winding tessellation and
+adaptive cubic-curve stroke tessellation in C++ through the official
+`godot-cpp` bindings. It supports the self-intersecting Processing-style body
+paths and the lizard's round-capped cubic limbs.
 
 ## One-time requirements on Windows
 
@@ -31,7 +32,7 @@ the existing checkout. Build an optimized export library with:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 `
-    -Target template_release
+	-Target template_release
 ```
 
 The `.gdextension` resource loads the correct debug or release DLL from
@@ -43,12 +44,18 @@ project opens; there is no plugin checkbox to enable.
 ```gdscript
 var tessellator = ClassDB.instantiate(&"NonZeroPathTessellatorNative")
 var triangles: PackedVector2Array = tessellator.tessellate(path, 0.001)
+
+var stroker = ClassDB.instantiate(&"CubicStrokeTessellatorNative")
+var stroke_triangles: PackedVector2Array = stroker.tessellate(
+	start, control_1, control_2, end, width, 0.2, 12, 0
+)
 ```
 
-The Snake uses this automatically when `Body Render Mode` is set to
-`Processing Vector Fill`; Fish and Lizard use it for their curved bodies and
-fins. If the native class is unavailable, Godot reports an error and skips
-those fills instead of silently selecting another tessellator.
+Snake, Fish, and Lizard use the non-zero tessellator for their curved bodies
+and fins. Lizard's `Native Cubic` arm renderer uses the cubic stroker; its
+`Legacy Polyline` mode remains available for direct comparison. If the native
+classes are unavailable, Godot reports an error; lizard limbs fall back to the
+legacy renderer so they remain visible.
 
 ## Test
 
@@ -58,6 +65,10 @@ Run the native correctness tests from the project root with:
 & 'C:\Godot\4.7\engine\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe' `
     --headless --path . `
     --script res://tests/non_zero_path_tessellator_native_test.gd
+
+& 'C:\Godot\4.7\engine\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe' `
+    --headless --path . `
+    --script res://tests/cubic_stroke_tessellator_native_test.gd
 ```
 
 ## What Godot needs at runtime
