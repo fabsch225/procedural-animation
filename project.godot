@@ -28,6 +28,7 @@ gdscript/warnings/enable=false
 window/size/always_on_top=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+mouse_cursor/custom_image="uid://bpkwvayghu3rg"
 
 [editor_plugins]
 

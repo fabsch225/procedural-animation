@@ -26,4 +26,3 @@ color = Color(0.152941, 0.176471, 0.203922, 1)
 [node name="Chain" parent="." unique_id=774651494 instance=ExtResource("2_sugp2")]
 
 [node name="Pointer" parent="." unique_id=38199738 instance=ExtResource("3_pointer")]
-layout_mode = 1
