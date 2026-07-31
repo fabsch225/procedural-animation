@@ -256,8 +256,9 @@ popup/item_1/id = 1
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 bbcode_enabled = true
-text = "See code: [url=https://github.com/BaconEggsRL/procedural-animation]GitHub[/url]
-See code: [url=https://github.com/BaconEggsRL/procedural-animation]GitHub[/url]"
+text = "[img=24]res://ui/icons/other/github.png[/img] [url=https://github.com/BaconEggsRL/procedural-animation]GitHub[/url] | [img=24]res://ui/icons/other/kofi_cup.webp[/img] [url=https://ko-fi.com/baconeggsrl]KoFi[/url]"
+fit_content = true
+scroll_active = false
 script = SubResource("GDScript_a8y0u")
 
 [node name="DebugOverlay" type="CanvasLayer" parent="." unique_id=290490654]

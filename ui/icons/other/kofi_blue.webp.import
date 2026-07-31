@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cxkag0h6v5ie5"
-path="res://.godot/imported/GitHub_Invertocat_White.png-f2c321287c7805c2ea2593ac05fa08be.ctex"
+uid="uid://bhu2g606181c5"
+path="res://.godot/imported/kofi_blue.webp-a7249d257f50c9d45b8ab8c40099f246.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/icons/GitHub_Invertocat_White.png"
-dest_files=["res://.godot/imported/GitHub_Invertocat_White.png-f2c321287c7805c2ea2593ac05fa08be.ctex"]
+source_file="res://ui/icons/other/kofi_blue.webp"
+dest_files=["res://.godot/imported/kofi_blue.webp-a7249d257f50c9d45b8ab8c40099f246.ctex"]
 
 [params]
 
