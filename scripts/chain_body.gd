@@ -15,6 +15,9 @@ extends Node2D
 @export_range(-PI, PI, 0.01, "radians") var initial_heading: float = 0.0
 @export_range(-PI / 2.0, PI / 2.0, 0.01, "radians") var initial_joint_bend: float = 0.06
 
+@export_group("Anchor")
+@export var anchored: bool = false
+
 @export_group("Shared Appearance")
 @export var body_color: Color = Color.WHITE
 @export var outline_color: Color = Color.WHITE
@@ -26,6 +29,7 @@ extends Node2D
 @export var debug_chain: bool = false
 
 var spine: Chain
+var anchor_position: Vector2 = Vector2.ZERO
 var _native_tessellator: Object
 var _native_tessellator_checked: bool = false
 var _native_error_reported: bool = false
@@ -57,6 +61,7 @@ func _ready() -> void:
 		initial_joint_bend, -angle_constraint, angle_constraint
 	)
 	spine.set_curved_pose(origin, initial_heading, constrained_initial_bend)
+	anchor_position = spine.joints.back()
 	_on_spine_created()
 	queue_redraw()
 
@@ -79,11 +84,29 @@ func is_active() -> bool:
 func _process(delta: float) -> void:
 	var head := spine.joints[0]
 	var offset := get_local_mouse_position() - head
+	var target := head
 	if not offset.is_zero_approx():
 		var distance := minf(movement_speed * delta, offset.length())
-		spine.resolve(head + offset.normalized() * distance)
+		target = head + offset.normalized() * distance
+
+	if anchored:
+		spine.fabrik_resolve(target, anchor_position)
+	elif target != head:
+		spine.resolve(target)
 	_after_spine_resolved(delta)
 	queue_redraw()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"anchor"):
+		toggle_anchor()
+		get_viewport().set_input_as_handled()
+
+
+func toggle_anchor() -> void:
+	if not anchored and spine != null and not spine.joints.is_empty():
+		anchor_position = spine.joints.back()
+	anchored = not anchored
 
 
 func _draw() -> void:

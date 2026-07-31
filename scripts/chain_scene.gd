@@ -332,13 +332,15 @@ func _collision_clearance() -> float:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			if not locked and chain != null:
-				lock_anchor = chain.joints.back()
+	if event.is_action_pressed(&"anchor"):
+		toggle_anchor()
+		get_viewport().set_input_as_handled()
 
-			locked = not locked
-			get_viewport().set_input_as_handled()
+
+func toggle_anchor() -> void:
+	if not locked and chain != null and not chain.joints.is_empty():
+		lock_anchor = chain.joints.back()
+	locked = not locked
 
 
 func _draw() -> void:

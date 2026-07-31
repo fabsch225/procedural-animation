@@ -15,6 +15,8 @@ func _run() -> void:
 	root.add_child(main_scene)
 	await process_frame
 	paused = false
+	_assert_right_click_behavior(main_scene)
+	_assert_left_click_behavior(main_scene)
 
 	_send_key(main_scene, KEY_ENTER)
 	_assert_paused(main_scene, true, "Enter")
@@ -49,9 +51,24 @@ func _assert_tooltip_delay() -> void:
 
 
 func _assert_input_actions() -> void:
+	_assert_action_mouse_button(&"anchor", MOUSE_BUTTON_RIGHT)
+	_assert_action_mouse_button(&"cycle_body", MOUSE_BUTTON_LEFT)
 	_assert_action_keys(&"pause", [KEY_ESCAPE, KEY_SPACE, KEY_ENTER, KEY_KP_ENTER])
 	_assert_action_keys(&"fullscreen", [KEY_F])
 	_assert_action_keys(&"restart", [KEY_R])
+
+
+func _assert_action_mouse_button(action: StringName, expected_button: MouseButton) -> void:
+	if not _action_has_mouse_button(action, expected_button):
+		_fail("%s action is missing mouse button %d" % [action, expected_button])
+
+
+func _action_has_mouse_button(action: StringName, button: MouseButton) -> bool:
+	for event in InputMap.action_get_events(action):
+		if event is InputEventMouseButton \
+				and (event as InputEventMouseButton).button_index == button:
+			return true
+	return false
 
 
 func _assert_action_keys(action: StringName, expected_keys: Array) -> void:
@@ -69,8 +86,6 @@ func _assert_action_tooltips(main_scene: Node) -> void:
 		&"_get_action_hotkey_text", &"fullscreen"
 	)
 	var pause_hotkey: String = main_scene.call(&"_get_action_hotkey_text", &"pause")
-	var enter_event := InputEventKey.new()
-	enter_event.keycode = KEY_ENTER
 	var keypad_enter_event := InputEventKey.new()
 	keypad_enter_event.keycode = KEY_KP_ENTER
 	var fullscreen_button := main_scene.get_node(
@@ -81,10 +96,91 @@ func _assert_action_tooltips(main_scene: Node) -> void:
 		_fail("fullscreen tooltip did not use its Input Map binding")
 	if not pause_button.tooltip_text.ends_with("(%s)" % pause_hotkey):
 		_fail("pause tooltip did not use its Input Map bindings")
-	if enter_event.as_text_keycode() not in pause_hotkey:
-		_fail("pause tooltip did not show Enter")
-	if keypad_enter_event.as_text_keycode() in pause_hotkey:
-		_fail("pause tooltip should collapse keypad Enter into Enter")
+	for expected_label in ["Esc", "Space", "Enter"]:
+		if expected_label not in pause_hotkey:
+			_fail("pause tooltip omitted %s" % expected_label)
+	if "Escape" in pause_hotkey \
+			or "Spacebar" in pause_hotkey \
+			or "Left Mouse Button" in pause_hotkey \
+			or "Right Mouse Button" in pause_hotkey \
+			or keypad_enter_event.as_text_keycode() in pause_hotkey:
+		_fail("pause tooltip did not use compact input labels")
+
+
+func _assert_right_click_behavior(main_scene: Node) -> void:
+	var selector := main_scene.get_node(
+		"Pause/DebugPanel/Margin/Options/RightClickRow/Behavior"
+	) as OptionButton
+	var pause_button := main_scene.get_node("UI/Controls/PauseButton") as TextureButton
+	if selector == null or selector.item_count != 2:
+		_fail("right-click behavior selector was not initialized")
+		return
+	var original_selection := selector.selected
+
+	selector.select(0)
+	selector.item_selected.emit(0)
+	if not _action_has_mouse_button(&"anchor", MOUSE_BUTTON_RIGHT) \
+			or _action_has_mouse_button(&"pause", MOUSE_BUTTON_RIGHT):
+		_fail("Anchor behavior did not move right click to the anchor action")
+
+	selector.select(1)
+	selector.item_selected.emit(1)
+	if _action_has_mouse_button(&"anchor", MOUSE_BUTTON_RIGHT) \
+			or not _action_has_mouse_button(&"pause", MOUSE_BUTTON_RIGHT):
+		_fail("Pause behavior did not move right click to the pause action")
+	var pause_hotkey: String = main_scene.call(&"_get_action_hotkey_text", &"pause")
+	if not pause_button.tooltip_text.ends_with("(%s)" % pause_hotkey) \
+			or "RMB" not in pause_hotkey:
+		_fail("pause tooltip did not update for the right-click binding")
+
+	var right_click := InputEventMouseButton.new()
+	right_click.button_index = MOUSE_BUTTON_RIGHT
+	right_click.pressed = true
+	main_scene.call(&"_unhandled_input", right_click)
+	_assert_paused(main_scene, true, "right click")
+	main_scene.call(&"_unhandled_input", right_click)
+	_assert_paused(main_scene, false, "second right click")
+
+	selector.select(original_selection)
+	selector.item_selected.emit(original_selection)
+
+
+func _assert_left_click_behavior(main_scene: Node) -> void:
+	var selector := main_scene.get_node(
+		"Pause/DebugPanel/Margin/Options/LeftClickRow/Behavior"
+	) as OptionButton
+	var pause_button := main_scene.get_node("UI/Controls/PauseButton") as TextureButton
+	if selector == null or selector.item_count != 2:
+		_fail("left-click behavior selector was not initialized")
+		return
+	var original_selection := selector.selected
+
+	selector.select(0)
+	selector.item_selected.emit(0)
+	if not _action_has_mouse_button(&"cycle_body", MOUSE_BUTTON_LEFT) \
+			or _action_has_mouse_button(&"pause", MOUSE_BUTTON_LEFT):
+		_fail("Cycle behavior did not move left click to the cycle action")
+
+	selector.select(1)
+	selector.item_selected.emit(1)
+	if _action_has_mouse_button(&"cycle_body", MOUSE_BUTTON_LEFT) \
+			or not _action_has_mouse_button(&"pause", MOUSE_BUTTON_LEFT):
+		_fail("Pause behavior did not move left click to the pause action")
+	var pause_hotkey: String = main_scene.call(&"_get_action_hotkey_text", &"pause")
+	if not pause_button.tooltip_text.ends_with("(%s)" % pause_hotkey) \
+			or "LMB" not in pause_hotkey:
+		_fail("pause tooltip did not update for the left-click binding")
+
+	var left_click := InputEventMouseButton.new()
+	left_click.button_index = MOUSE_BUTTON_LEFT
+	left_click.pressed = true
+	main_scene.call(&"_unhandled_input", left_click)
+	_assert_paused(main_scene, true, "left click")
+	main_scene.call(&"_unhandled_input", left_click)
+	_assert_paused(main_scene, false, "second left click")
+
+	selector.select(original_selection)
+	selector.item_selected.emit(original_selection)
 
 
 func _assert_pause_button(main_scene: Node) -> void:
@@ -97,14 +193,14 @@ func _assert_pause_button(main_scene: Node) -> void:
 		_fail("pause button must consume clicks before body switching")
 	var body_index_before_click := switcher.active_body_index
 	if pause_button.texture_normal.resource_path.get_file() != "pause.png" \
-			or not pause_button.tooltip_text.begins_with("Pause "):
+			or not pause_button.tooltip_text.begins_with("Pause"):
 		_fail("unpaused pause button did not show its pause state")
 	pause_button.pressed.emit()
 	_assert_paused(main_scene, true, "pause button")
 	if switcher.active_body_index != body_index_before_click:
 		_fail("pause button click also cycled the active body")
 	if pause_button.texture_normal.resource_path.get_file() != "open.png" \
-			or not pause_button.tooltip_text.begins_with("Unpause "):
+			or not pause_button.tooltip_text.begins_with("Unpause"):
 		_fail("paused pause button did not show its unpause state")
 	pause_button.pressed.emit()
 	_assert_paused(main_scene, false, "second pause button click")

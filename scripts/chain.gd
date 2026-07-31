@@ -71,6 +71,23 @@ func fabrik_resolve(position: Vector2, anchor: Vector2) -> void:
 	for i in range(joints.size() - 2, -1, -1):
 		joints[i] = Util.constrain_distance(joints[i], joints[i + 1], link_size)
 
+	_update_angles_from_joints()
+
+
+# FABRIK solves positions directly. Keep the derived angles synchronized so
+# bodies that use them for their outline normals can use the same solver.
+func _update_angles_from_joints() -> void:
+	if joints.size() < 2:
+		return
+
+	var head_direction := joints[0] - joints[1]
+	if not head_direction.is_zero_approx():
+		angles[0] = head_direction.angle()
+	for i in range(1, joints.size()):
+		var link_direction := joints[i - 1] - joints[i]
+		if not link_direction.is_zero_approx():
+			angles[i] = link_direction.angle()
+
 
 # Pushes every joint outside a polygonal collision constraint.
 func constrain_against_polygon(polygon: PackedVector2Array, clearance: float) -> void:

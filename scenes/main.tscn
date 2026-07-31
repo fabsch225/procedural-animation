@@ -15,6 +15,21 @@
 [ext_resource type="Texture2D" uid="uid://7awadmo5x2b6" path="res://ui/icons/2x/larger.png" id="12_larger"]
 [ext_resource type="Script" uid="uid://bqnowoh1ho7bd" path="res://scripts/control_debug_overlay.gd" id="14_control_debug"]
 
+[sub_resource type="GDScript" id="GDScript_a8y0u"]
+script/source = "extends RichTextLabel
+
+func _ready() -> void:
+	# Connect the signal via code (or use the Node tab in the editor)
+	meta_clicked.connect(_on_meta_clicked)
+
+func _on_meta_clicked(meta: Variant) -> void:
+	var meta_string = str(meta)
+
+	# Scenario A: If it's a web URL, open it in the user's browser
+	if meta_string.begins_with(\"http://\") or meta_string.begins_with(\"https://\"):
+		OS.shell_open(meta_string)
+"
+
 [node name="main" type="Node" unique_id=1152084155]
 script = ExtResource("1_0wfyh")
 
@@ -161,7 +176,7 @@ anchor_right = 1.0
 offset_left = -276.0
 offset_top = 116.0
 offset_right = -16.0
-offset_bottom = 260.0
+offset_bottom = 360.0
 grow_horizontal = 0
 
 [node name="Margin" type="MarginContainer" parent="Pause/DebugPanel" unique_id=1192816322]
@@ -193,6 +208,58 @@ tooltip_text = "Outline visible Control nodes and show their live sizes"
 mouse_default_cursor_shape = 2
 text = "Show UI bounds"
 
+[node name="RightClickRow" type="HBoxContainer" parent="Pause/DebugPanel/Margin/Options" unique_id=1691460462]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="Pause/DebugPanel/Margin/Options/RightClickRow" unique_id=1997972783]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Right click"
+
+[node name="Behavior" type="OptionButton" parent="Pause/DebugPanel/Margin/Options/RightClickRow" unique_id=179716962]
+custom_minimum_size = Vector2(104, 36)
+layout_mode = 2
+tooltip_text = "Choose whether right click anchors the current body or pauses the game"
+focus_mode = 0
+mouse_default_cursor_shape = 2
+selected = 1
+item_count = 2
+popup/item_0/text = "Anchor"
+popup/item_0/id = 0
+popup/item_1/text = "Pause"
+popup/item_1/id = 1
+
+[node name="LeftClickRow" type="HBoxContainer" parent="Pause/DebugPanel/Margin/Options" unique_id=2075782963]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="Pause/DebugPanel/Margin/Options/LeftClickRow" unique_id=2025062494]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Left click"
+
+[node name="Behavior" type="OptionButton" parent="Pause/DebugPanel/Margin/Options/LeftClickRow" unique_id=251661613]
+custom_minimum_size = Vector2(104, 36)
+layout_mode = 2
+tooltip_text = "Choose whether left click cycles bodies or pauses the game"
+focus_mode = 0
+mouse_default_cursor_shape = 2
+selected = 0
+item_count = 2
+popup/item_0/text = "Cycle"
+popup/item_0/id = 0
+popup/item_1/text = "Pause"
+popup/item_1/id = 1
+
+[node name="AboutLabel" type="RichTextLabel" parent="Pause/DebugPanel/Margin/Options" unique_id=750135522]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+bbcode_enabled = true
+text = "See code: [url=https://github.com/BaconEggsRL/procedural-animation]GitHub[/url]
+See code: [url=https://github.com/BaconEggsRL/procedural-animation]GitHub[/url]"
+script = SubResource("GDScript_a8y0u")
+
 [node name="DebugOverlay" type="CanvasLayer" parent="." unique_id=290490654]
 layer = 100
 
@@ -205,3 +272,4 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("14_control_debug")
+metadata/_edit_lock_ = true

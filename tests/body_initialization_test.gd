@@ -22,6 +22,7 @@ func _run() -> void:
 		return
 	_assert_body_menu(main_scene.get_node("UI/Controls/BodyName") as MenuButton, switcher)
 	await _assert_control_debug_overlay(main_scene)
+	_assert_chain_scene_anchor(switcher.bodies[0] as ChainScene)
 
 	paused = true
 	for body_index in range(1, switcher.bodies.size()):
@@ -30,6 +31,7 @@ func _run() -> void:
 		if body == null:
 			continue
 		_assert_consistent_chain(body.body_name, body.spine)
+		_assert_chain_body_anchor(body)
 		if not body.visible:
 			_fail("%s was not visible after a paused switch" % body.body_name)
 
@@ -42,6 +44,37 @@ func _run() -> void:
 		_assert_initialized_lizard_arms(lizard)
 
 	_finish(main_scene)
+
+
+func _anchor_action_event() -> InputEventAction:
+	var event := InputEventAction.new()
+	event.action = &"anchor"
+	event.pressed = true
+	return event
+
+
+func _assert_chain_scene_anchor(body: ChainScene) -> void:
+	if body == null or body.chain == null:
+		_fail("chain scene was unavailable for anchor testing")
+		return
+	var expected_anchor := body.chain.joints.back()
+	body.call(&"_unhandled_input", _anchor_action_event())
+	if not body.locked or body.lock_anchor.distance_to(expected_anchor) > POSITION_EPSILON:
+		_fail("chain scene did not anchor its tail through the anchor action")
+	body.call(&"_unhandled_input", _anchor_action_event())
+	if body.locked:
+		_fail("chain scene did not release its anchor")
+
+
+func _assert_chain_body_anchor(body: ChainBody) -> void:
+	var expected_anchor := body.spine.joints.back()
+	body.call(&"_unhandled_input", _anchor_action_event())
+	if not body.anchored \
+			or body.anchor_position.distance_to(expected_anchor) > POSITION_EPSILON:
+		_fail("%s did not anchor its tail through the anchor action" % body.body_name)
+	body.call(&"_unhandled_input", _anchor_action_event())
+	if body.anchored:
+		_fail("%s did not release its anchor" % body.body_name)
 
 
 func _assert_control_debug_overlay(main_scene: Node) -> void:
