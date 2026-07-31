@@ -9,9 +9,7 @@ enum OutlineMode {
 
 enum BodyRenderMode {
 	GODOT_RIBBON,
-	PROCESSING_CURVE,
 	PROCESSING_VECTOR_FILL,
-	PROCESSING_VECTOR_FILL_NATIVE,
 }
 
 @export_group("Body")
@@ -40,7 +38,7 @@ enum BodyRenderMode {
 var spine: Chain
 var _native_tessellator: Object
 var _native_tessellator_checked: bool = false
-var _native_fallback_reported: bool = false
+var _native_error_reported: bool = false
 
 
 func _ready() -> void:
@@ -81,24 +79,14 @@ func _draw() -> void:
 	if spine == null or spine.joints.size() < 2:
 		return
 
+	if body_render_mode == BodyRenderMode.PROCESSING_VECTOR_FILL:
+		_draw_processing_vector_body()
+		_draw_eyes()
+		if debug_chain:
+			spine.draw(self)
+		return
+
 	var samples := _build_body_samples()
-	if body_render_mode == BodyRenderMode.PROCESSING_VECTOR_FILL \
-			or body_render_mode == BodyRenderMode.PROCESSING_VECTOR_FILL_NATIVE:
-		_draw_processing_vector_body(
-			body_render_mode == BodyRenderMode.PROCESSING_VECTOR_FILL_NATIVE
-		)
-		_draw_eyes()
-		if debug_chain:
-			spine.draw(self)
-		return
-
-	if body_render_mode == BodyRenderMode.PROCESSING_CURVE:
-		_draw_processing_body(samples)
-		_draw_eyes()
-		if debug_chain:
-			spine.draw(self)
-		return
-
 	# Every piece is convex, so self-crossings never require triangulating one
 	# large, self-intersecting outline. Draw from tail to head for stable overlap.
 	if outline_mode == OutlineMode.SILHOUETTE:
@@ -113,18 +101,9 @@ func _draw() -> void:
 		spine.draw(self)
 
 
-func _draw_processing_body(samples: Array[BodySample]) -> void:
-	# Keep the triangle-based fill so self-intersections remain safe, but inset
-	# it beneath the exact Processing-style curveVertex stroke.
-	_draw_body(samples, outline_width, body_color)
+func _draw_processing_vector_body() -> void:
 	var path := _build_processing_outline()
-	if path.size() >= 2 and outline_width > 0.0:
-		draw_polyline(path, outline_color, outline_width, true)
-
-
-func _draw_processing_vector_body(use_native_tessellator: bool = false) -> void:
-	var path := _build_processing_outline()
-	var triangles := _tessellate_processing_path(path, use_native_tessellator)
+	var triangles := _tessellate_processing_path(path)
 
 	if not triangles.is_empty():
 		var indices := PackedInt32Array()
@@ -143,24 +122,20 @@ func _draw_processing_vector_body(use_native_tessellator: bool = false) -> void:
 		draw_polyline(path, outline_color, outline_width, true)
 
 
-func _tessellate_processing_path(
-	path: PackedVector2Array,
-	use_native_tessellator: bool
-) -> PackedVector2Array:
-	if use_native_tessellator:
-		var native := _get_native_tessellator()
-		if native != null:
-			var result: Variant = native.call(&"tessellate", path)
-			if result is PackedVector2Array:
-				return result as PackedVector2Array
-		if not _native_fallback_reported:
-			push_warning(
-				"Native snake tessellator is unavailable; using the GDScript backup. "
-				+ "Build native/non_zero_tessellator first."
-			)
-			_native_fallback_reported = true
+func _tessellate_processing_path(path: PackedVector2Array) -> PackedVector2Array:
+	var native := _get_native_tessellator()
+	if native != null:
+		var result: Variant = native.call(&"tessellate", path)
+		if result is PackedVector2Array:
+			return result as PackedVector2Array
 
-	return NonZeroPathTessellator2D.tessellate(path)
+	if not _native_error_reported:
+		push_error(
+			"Native snake tessellator is unavailable. Build "
+			+ "native/non_zero_tessellator before using Processing Vector Fill."
+		)
+		_native_error_reported = true
+	return PackedVector2Array()
 
 
 func _get_native_tessellator() -> Object:
@@ -178,9 +153,7 @@ func _get_native_tessellator() -> Object:
 func get_active_tessellator_backend() -> StringName:
 	match body_render_mode:
 		BodyRenderMode.PROCESSING_VECTOR_FILL:
-			return &"gdscript"
-		BodyRenderMode.PROCESSING_VECTOR_FILL_NATIVE:
-			return &"gdextension" if _get_native_tessellator() != null else &"gdscript_fallback"
+			return &"gdextension" if _get_native_tessellator() != null else &"unavailable"
 		_:
 			return &"not_applicable"
 

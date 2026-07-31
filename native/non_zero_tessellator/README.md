@@ -1,8 +1,8 @@
 # Native non-zero path tessellator
 
-This GDExtension implements the same scanbeam `NON_ZERO` winding tessellation
-as `scripts/non_zero_path_tessellator_2d.gd`, in C++ through the official
-`godot-cpp` bindings.
+This GDExtension implements scanbeam `NON_ZERO` winding tessellation in C++
+through the official `godot-cpp` bindings. It supports the self-intersecting
+Processing-style path used by the snake.
 
 ## One-time requirements on Windows
 
@@ -45,45 +45,20 @@ var tessellator = ClassDB.instantiate(&"NonZeroPathTessellatorNative")
 var triangles: PackedVector2Array = tessellator.tessellate(path, 0.001)
 ```
 
-The Snake does this automatically in its native render mode and falls back to
-the GDScript implementation if the native class is unavailable.
+The Snake uses this automatically when `Body Render Mode` is set to
+`Processing Vector Fill`. If the native class is unavailable, Godot reports
+an error and skips the body fill instead of silently selecting another
+tessellator.
 
-## Compare the two backends
+## Test
 
-On a `Snake` node, select either of these `Body Render Mode` values:
-
-- `Processing Vector Fill` uses the pure GDScript backup.
-- `Processing Vector Fill Native` uses this GDExtension, with automatic
-  fallback if its DLL is missing.
-
-The main scene currently selects the native mode. Both modes build the same
-Processing-style outline, apply the same `NON_ZERO` fill rule, and feed the
-same explicit triangle format to `RenderingServer`, so they are suitable for
-an apples-to-apples profiler comparison.
-
-Run the standalone comparison from the project root with:
+Run the native correctness tests from the project root with:
 
 ```powershell
 & 'C:\Godot\4.7\engine\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe' `
     --headless --path . `
-    --script res://tests/non_zero_path_tessellator_benchmark.gd
+    --script res://tests/non_zero_path_tessellator_native_test.gd
 ```
-
-The initial debug-editor measurement on the development machine, using the
-included 192-point crossing contour for 30 runs, was approximately 4,257
-microseconds per call in GDScript and 52 microseconds per call in the native
-extension (about 82x faster). Treat that as a baseline, not a universal result;
-the included benchmark is the source of truth for each machine and build.
-
-The parity test can be rerun by replacing the script path above with:
-
-```text
-res://tests/non_zero_path_tessellator_native_test.gd
-```
-
-For production measurements, compare an exported release build as well as the
-editor. Godot loads `template_debug` in the editor and `template_release` for
-a release export.
 
 ## What Godot needs at runtime
 
@@ -92,5 +67,5 @@ descriptor names the native class entry point and maps debug/release builds to
 their DLLs. There is no editor plugin to enable and no autoload to add.
 
 If the C++ source changes, rerun the appropriate build command and restart the
-editor if Windows has the DLL locked. If only GDScript changes, no native
-rebuild is needed.
+editor if Windows has the DLL locked. Scene and GDScript changes do not require
+a native rebuild.

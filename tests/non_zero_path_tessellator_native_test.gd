@@ -1,7 +1,6 @@
 extends SceneTree
 
 
-const GDSCRIPT_TESSELLATOR := preload("res://scripts/non_zero_path_tessellator_2d.gd")
 const TOLERANCE: float = 0.01
 
 var failures: int = 0
@@ -47,7 +46,7 @@ func _init() -> void:
 	)
 
 	if failures == 0:
-		print("NonZeroPathTessellatorNative parity tests passed")
+		print("NonZeroPathTessellatorNative tests passed")
 		quit()
 	else:
 		push_error("NonZeroPathTessellatorNative: %d test(s) failed" % failures)
@@ -56,9 +55,7 @@ func _init() -> void:
 
 func _test_area(test_name: String, contour: PackedVector2Array, expected_area: float) -> void:
 	var native_triangles := _native_tessellate(contour)
-	var gdscript_triangles: PackedVector2Array = GDSCRIPT_TESSELLATOR.tessellate(contour)
 	var native_area := _triangle_area(native_triangles)
-	var gdscript_area := _triangle_area(gdscript_triangles)
 
 	if native_triangles.size() % 3 != 0:
 		failures += 1
@@ -67,12 +64,6 @@ func _test_area(test_name: String, contour: PackedVector2Array, expected_area: f
 	if absf(native_area - expected_area) > TOLERANCE:
 		failures += 1
 		push_error("%s native area was %f, expected %f" % [test_name, native_area, expected_area])
-	if absf(native_area - gdscript_area) > TOLERANCE:
-		failures += 1
-		push_error(
-			"%s backends differ: native %f, GDScript %f"
-			% [test_name, native_area, gdscript_area]
-		)
 
 
 func _native_tessellate(contour: PackedVector2Array) -> PackedVector2Array:
