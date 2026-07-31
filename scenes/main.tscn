@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/chain.tscn" id="2_sugp2"]
 [ext_resource type="PackedScene" path="res://scenes/pointer.tscn" id="3_pointer"]
 [ext_resource type="Texture2D" uid="uid://cb7aweeon33nh" path="res://ui/pointers/2_double/cursor_none.png" id="4_jyhfs"]
-[ext_resource type="PackedScene" path="res://scenes/godot_icon.tscn" id="5_icon"]
+[ext_resource type="PackedScene" uid="uid://cah1xwm4r5u60" path="res://scenes/godot_icon.tscn" id="5_icon"]
 
 [node name="main" type="Control" unique_id=1152084155]
 layout_mode = 3
@@ -26,6 +26,7 @@ mouse_filter = 2
 color = Color(0.152941, 0.176471, 0.203922, 1)
 
 [node name="Chain" parent="." unique_id=774651494 instance=ExtResource("2_sugp2")]
+collision_obstacle_path = NodePath("../GodotIcon")
 
 [node name="GodotIcon" parent="." unique_id=2025408330 instance=ExtResource("5_icon")]
 

@@ -49,6 +49,66 @@ func fabrik_resolve(position: Vector2, anchor: Vector2) -> void:
 		joints[i] = Util.constrain_distance(joints[i], joints[i + 1], link_size)
 
 
+# Pushes every joint outside a polygonal collision constraint.
+func constrain_against_polygon(polygon: PackedVector2Array, clearance: float) -> void:
+	if polygon.size() < 3:
+		return
+
+	var polygon_center := Vector2.ZERO
+	for vertex in polygon:
+		polygon_center += vertex
+	polygon_center /= polygon.size()
+
+	for i in range(joints.size()):
+		var joint := joints[i]
+		var closest_point := _closest_point_on_polygon(joint, polygon)
+		var offset := joint - closest_point
+		var is_inside := Geometry2D.is_point_in_polygon(joint, polygon)
+
+		if not is_inside and offset.length_squared() >= clearance * clearance:
+			continue
+
+		if is_inside:
+			offset = closest_point - joint
+
+		if is_zero_approx(offset.length_squared()):
+			offset = closest_point - polygon_center
+		if is_zero_approx(offset.length_squared()):
+			offset = Vector2.UP
+
+		joints[i] = closest_point + offset.normalized() * clearance
+
+
+func constrain_against_circle(center: Vector2, radius: float) -> void:
+	for i in range(joints.size()):
+		var offset := joints[i] - center
+
+		if offset.length_squared() >= radius * radius:
+			continue
+
+		if is_zero_approx(offset.length_squared()):
+			offset = Vector2.UP
+
+		joints[i] = center + offset.normalized() * radius
+
+
+func _closest_point_on_polygon(point: Vector2, polygon: PackedVector2Array) -> Vector2:
+	var closest_point := polygon[0]
+	var closest_distance_squared := INF
+
+	for i in range(polygon.size()):
+		var segment_start := polygon[i]
+		var segment_end := polygon[(i + 1) % polygon.size()]
+		var candidate := Geometry2D.get_closest_point_to_segment(point, segment_start, segment_end)
+		var distance_squared := point.distance_squared_to(candidate)
+
+		if distance_squared < closest_distance_squared:
+			closest_distance_squared = distance_squared
+			closest_point = candidate
+
+	return closest_point
+
+
 # Draws the chain on a CanvasItem, such as the node calling this method in _draw().
 func draw(canvas: CanvasItem, line_thickness: float = 8.0, point_size: float = 32.0) -> void:
 	for i in range(joints.size() - 1):

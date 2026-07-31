@@ -1,8 +1,16 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://cah1xwm4r5u60"]
 
-[ext_resource type="Texture2D" path="res://icon.svg" id="1_icon"]
-[ext_resource type="Script" path="res://scripts/godot_icon.gd" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://c88jqud1yny1j" path="res://icon.svg" id="1_icon"]
+[ext_resource type="Script" uid="uid://bjyhgmpnjkip" path="res://scripts/godot_icon.gd" id="2_script"]
 
-[node name="GodotIcon" type="Sprite2D"]
-texture = ExtResource("1_icon")
+[sub_resource type="CircleShape2D" id="CircleShape2D_ndb8m"]
+radius = 99.0202
+
+[node name="GodotIcon" type="StaticBody2D" unique_id=654798049]
 script = ExtResource("2_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2112253973]
+texture = ExtResource("1_icon")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1933108713]
+shape = SubResource("CircleShape2D_ndb8m")
