@@ -17,7 +17,6 @@
 
 [node name="main" type="Node" unique_id=1152084155]
 script = ExtResource("1_0wfyh")
-hide_mouse_cursor = null
 
 [node name="Background" type="CanvasLayer" parent="." unique_id=281815590]
 layer = -1
@@ -134,6 +133,25 @@ stretch_mode = 5
 
 [node name="Pause" type="CanvasLayer" parent="." unique_id=1316151990]
 layer = 2
+
+[node name="PausedIndicator" type="RichTextLabel" parent="Pause" unique_id=2024659333]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -276.0
+offset_top = 8.0
+offset_right = -100.0
+offset_bottom = 100.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.94, 0.96, 0.98, 1)
+theme_override_colors/font_outline_color = Color(0.07, 0.09, 0.11, 0.8)
+theme_override_constants/outline_size = 5
+bbcode_enabled = true
+text = "[center][wave amp=3.0 freq=2.0 connected=1][font_size=28][b]P A U S E D[/b][/font_size][/wave][/center]"
+fit_content = true
+scroll_active = false
+vertical_alignment = 1
 
 [node name="DebugPanel" type="PanelContainer" parent="Pause" unique_id=955231251]
 custom_minimum_size = Vector2(260, 0)

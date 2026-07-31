@@ -13,11 +13,9 @@ const UNPAUSE_ICON: Texture2D = preload("res://ui/icons/2x/open.png")
 
 @onready var pause_layer: CanvasLayer = $Pause
 @onready var pause_button: TextureButton = $UI/Controls/PauseButton
-@onready var pause_debug_panel: Control = $Pause/DebugPanel
 @onready var debug_chain_toggle: CheckButton = $Pause/DebugPanel/Margin/Options/DebugChain
 @onready var ui_bounds_toggle: CheckButton = $Pause/DebugPanel/Margin/Options/UIBounds
 @onready var body_switcher: BodySwitcher = $World/bodies
-@onready var body_name_menu: MenuButton = $UI/Controls/BodyName
 @onready var fullscreen_button: TextureButton = $UI/Controls/FullscreenButton
 @onready var control_debug_overlay: ControlDebugOverlay = $DebugOverlay/ControlBounds
 
@@ -46,17 +44,7 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			if _is_mouse_over_pause_button() \
-					or _is_mouse_over_body_name_menu() \
-					or _is_mouse_over_fullscreen_button():
-				return
-			if get_tree().paused and _is_mouse_over_pause_debug_panel():
-				return
-			toggle_pause()
-			consume_input()
-	elif event is InputEventKey:
+	if event is InputEventKey:
 		if event.is_action_pressed(&"restart") and not event.echo:
 			consume_input()
 			get_tree().paused = false
@@ -137,10 +125,20 @@ func _with_action_hotkey(label: String, action: StringName) -> String:
 
 func _get_action_hotkey_text(action: StringName) -> String:
 	var labels := PackedStringArray()
-	for input_event in InputMap.action_get_events(action):
+	var input_events := InputMap.action_get_events(action)
+	var mapped_keycodes: Array[int] = []
+	for input_event in input_events:
+		if input_event is InputEventKey:
+			mapped_keycodes.append((input_event as InputEventKey).keycode)
+	for input_event in input_events:
 		var event_label := ""
 		if input_event is InputEventKey:
-			event_label = (input_event as InputEventKey).as_text_keycode()
+			var key_event := input_event as InputEventKey
+			# Treat keypad Enter as an alternate physical way to press Enter in
+			# compact UI text when both are mapped; it remains a real binding.
+			if key_event.keycode == KEY_KP_ENTER and KEY_ENTER in mapped_keycodes:
+				continue
+			event_label = key_event.as_text_keycode()
 		else:
 			event_label = input_event.as_text()
 		if not event_label.is_empty() and event_label not in labels:
@@ -152,28 +150,3 @@ func _is_fullscreen() -> bool:
 	var mode := DisplayServer.window_get_mode()
 	return mode == DisplayServer.WINDOW_MODE_FULLSCREEN \
 		or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
-
-
-func _is_mouse_over_fullscreen_button() -> bool:
-	return fullscreen_button.is_visible_in_tree() \
-		and fullscreen_button.get_global_rect().has_point(
-			get_viewport().get_mouse_position()
-		)
-
-
-func _is_mouse_over_pause_button() -> bool:
-	return pause_button.is_visible_in_tree() \
-		and pause_button.get_global_rect().has_point(
-			get_viewport().get_mouse_position()
-		)
-
-
-func _is_mouse_over_body_name_menu() -> bool:
-	return body_name_menu.is_visible_in_tree() \
-		and body_name_menu.get_global_rect().has_point(
-			get_viewport().get_mouse_position()
-		)
-
-
-func _is_mouse_over_pause_debug_panel() -> bool:
-	return pause_debug_panel.get_global_rect().has_point(get_viewport().get_mouse_position())

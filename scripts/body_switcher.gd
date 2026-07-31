@@ -33,6 +33,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		cycle_body(1)
 	elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
 		cycle_body(-1)
+	elif event.button_index == MOUSE_BUTTON_LEFT:
+		cycle_body(1)
 	else:
 		return
 

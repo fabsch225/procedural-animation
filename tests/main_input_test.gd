@@ -9,6 +9,7 @@ func _init() -> void:
 
 
 func _run() -> void:
+	_assert_tooltip_delay()
 	_assert_input_actions()
 	var main_scene: Node = (load("res://scenes/main.tscn") as PackedScene).instantiate()
 	root.add_child(main_scene)
@@ -16,11 +17,15 @@ func _run() -> void:
 	paused = false
 
 	_send_key(main_scene, KEY_ENTER)
-	_assert_paused(main_scene, false, "removed Enter binding")
+	_assert_paused(main_scene, true, "Enter")
+	_send_key(main_scene, KEY_KP_ENTER)
+	_assert_paused(main_scene, false, "keypad Enter")
 	_send_key(main_scene, KEY_SPACE)
 	_assert_paused(main_scene, true, "Space")
 	_send_key(main_scene, KEY_ESCAPE)
 	_assert_paused(main_scene, false, "Escape")
+	_assert_left_click_cycles_body(main_scene)
+	_assert_pause_indicator_layout(main_scene)
 	_assert_pause_button(main_scene)
 	_assert_action_tooltips(main_scene)
 
@@ -35,8 +40,16 @@ func _run() -> void:
 		quit(1)
 
 
+func _assert_tooltip_delay() -> void:
+	var delay: float = ProjectSettings.get_setting(
+		&"gui/timers/tooltip_delay_sec", 0.5
+	)
+	if not is_equal_approx(delay, 0.05):
+		_fail("project tooltip delay was not set to 0.05 seconds")
+
+
 func _assert_input_actions() -> void:
-	_assert_action_keys(&"pause", [KEY_ESCAPE, KEY_SPACE])
+	_assert_action_keys(&"pause", [KEY_ESCAPE, KEY_SPACE, KEY_ENTER, KEY_KP_ENTER])
 	_assert_action_keys(&"fullscreen", [KEY_F])
 	_assert_action_keys(&"restart", [KEY_R])
 
@@ -56,6 +69,10 @@ func _assert_action_tooltips(main_scene: Node) -> void:
 		&"_get_action_hotkey_text", &"fullscreen"
 	)
 	var pause_hotkey: String = main_scene.call(&"_get_action_hotkey_text", &"pause")
+	var enter_event := InputEventKey.new()
+	enter_event.keycode = KEY_ENTER
+	var keypad_enter_event := InputEventKey.new()
+	keypad_enter_event.keycode = KEY_KP_ENTER
 	var fullscreen_button := main_scene.get_node(
 		"UI/Controls/FullscreenButton"
 	) as TextureButton
@@ -64,23 +81,63 @@ func _assert_action_tooltips(main_scene: Node) -> void:
 		_fail("fullscreen tooltip did not use its Input Map binding")
 	if not pause_button.tooltip_text.ends_with("(%s)" % pause_hotkey):
 		_fail("pause tooltip did not use its Input Map bindings")
+	if enter_event.as_text_keycode() not in pause_hotkey:
+		_fail("pause tooltip did not show Enter")
+	if keypad_enter_event.as_text_keycode() in pause_hotkey:
+		_fail("pause tooltip should collapse keypad Enter into Enter")
 
 
 func _assert_pause_button(main_scene: Node) -> void:
 	var pause_button := main_scene.get_node("UI/Controls/PauseButton") as TextureButton
+	var switcher := main_scene.get_node("World/bodies") as BodySwitcher
 	if pause_button == null or not pause_button.visible:
 		_fail("pause button was not available while unpaused")
 		return
+	if pause_button.mouse_filter != Control.MOUSE_FILTER_STOP:
+		_fail("pause button must consume clicks before body switching")
+	var body_index_before_click := switcher.active_body_index
 	if pause_button.texture_normal.resource_path.get_file() != "pause.png" \
 			or not pause_button.tooltip_text.begins_with("Pause "):
 		_fail("unpaused pause button did not show its pause state")
 	pause_button.pressed.emit()
 	_assert_paused(main_scene, true, "pause button")
+	if switcher.active_body_index != body_index_before_click:
+		_fail("pause button click also cycled the active body")
 	if pause_button.texture_normal.resource_path.get_file() != "open.png" \
 			or not pause_button.tooltip_text.begins_with("Unpause "):
 		_fail("paused pause button did not show its unpause state")
 	pause_button.pressed.emit()
 	_assert_paused(main_scene, false, "second pause button click")
+
+
+func _assert_pause_indicator_layout(main_scene: Node) -> void:
+	var indicator := main_scene.get_node("Pause/PausedIndicator") as RichTextLabel
+	var debug_panel := main_scene.get_node("Pause/DebugPanel") as Control
+	var pause_button := main_scene.get_node("UI/Controls/PauseButton") as Control
+	if indicator == null:
+		_fail("paused indicator was not found")
+		return
+	if not indicator.bbcode_enabled or "[wave" not in indicator.text:
+		_fail("paused indicator was not configured with a RichTextLabel wave")
+	var indicator_rect := indicator.get_global_rect()
+	if indicator_rect.position.x < debug_panel.get_global_rect().position.x - 0.01:
+		_fail("paused indicator extended left of the debug panel boundary")
+	if indicator_rect.end.x > pause_button.get_global_rect().position.x + 0.01:
+		_fail("paused indicator extended into the pause button")
+
+
+func _assert_left_click_cycles_body(main_scene: Node) -> void:
+	var switcher := main_scene.get_node("World/bodies") as BodySwitcher
+	var starting_index := switcher.active_body_index
+	var event := InputEventMouseButton.new()
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.pressed = true
+	switcher.call(&"_unhandled_input", event)
+	var expected_index := wrapi(starting_index + 1, 0, switcher.bodies.size())
+	if switcher.active_body_index != expected_index:
+		_fail("left click did not cycle to the next body")
+	if paused:
+		_fail("left-click body cycling unexpectedly paused the game")
 
 
 func _send_key(main_scene: Node, keycode: Key) -> void:
@@ -92,7 +149,9 @@ func _send_key(main_scene: Node, keycode: Key) -> void:
 
 func _assert_paused(main_scene: Node, expected: bool, source: String) -> void:
 	var pause_layer := main_scene.get_node("Pause") as CanvasLayer
-	if paused != expected or pause_layer.visible != expected:
+	var indicator := main_scene.get_node("Pause/PausedIndicator") as RichTextLabel
+	if paused != expected or pause_layer.visible != expected \
+			or indicator.is_visible_in_tree() != expected:
 		_fail("%s did not set pause state to %s" % [source, expected])
 
 
