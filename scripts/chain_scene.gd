@@ -21,7 +21,13 @@ extends Node2D
 @export_group("Hard Boundaries")
 @export var hard_boundaries_enabled: bool = true
 
+@export_group("Camera")
+@export var camera_enabled: bool = false
+@export var camera_position_smoothing_enabled: bool = true
+@export_range(0.1, 20.0, 0.1) var camera_position_smoothing_speed: float = 5.0
+
 var chain: Chain
+@onready var chain_camera: Camera2D = $Camera2D
 
 
 func _ready() -> void:
@@ -29,6 +35,7 @@ func _ready() -> void:
 	if use_viewport_center_as_lock_anchor:
 		lock_anchor = get_viewport_rect().get_center()
 	chain = Chain.new(lock_anchor, chain_segments, link_size, angle_constraint)
+	_update_camera()
 	queue_redraw()
 
 
@@ -41,7 +48,22 @@ func _process(_delta: float) -> void:
 		chain.resolve(target)
 
 	_apply_boundary_constraints()
+	_update_camera()
 	queue_redraw()
+
+
+func _update_camera() -> void:
+	chain_camera.enabled = camera_enabled
+	chain_camera.position_smoothing_enabled = camera_position_smoothing_enabled
+	chain_camera.position_smoothing_speed = camera_position_smoothing_speed
+
+	if not camera_enabled or chain == null or chain.joints.is_empty():
+		return
+
+	var chain_center := Vector2.ZERO
+	for joint in chain.joints:
+		chain_center += joint
+	chain_camera.position = chain_center / chain.joints.size()
 
 
 func _get_constrained_mouse_target() -> Vector2:
@@ -187,7 +209,7 @@ func _apply_boundary_constraints() -> void:
 
 	for node in get_tree().get_nodes_in_group(ChainBoundary.GROUP):
 		var boundary := node as ChainBoundary
-		if boundary == null:
+		if boundary == null or not boundary.is_visible_in_tree():
 			continue
 
 		if boundary.boundary_type == ChainBoundary.BoundaryType.SOFT:
@@ -234,7 +256,9 @@ func _get_hard_boundaries() -> Array[ChainBoundary]:
 
 	for node in get_tree().get_nodes_in_group(ChainBoundary.GROUP):
 		var boundary := node as ChainBoundary
-		if boundary != null and boundary.boundary_type == ChainBoundary.BoundaryType.HARD:
+		if boundary != null \
+				and boundary.is_visible_in_tree() \
+				and boundary.boundary_type == ChainBoundary.BoundaryType.HARD:
 			boundaries.append(boundary)
 
 	return boundaries

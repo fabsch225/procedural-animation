@@ -27,12 +27,16 @@ mouse_filter = 2
 color = Color(0.152941, 0.176471, 0.203922, 1)
 
 [node name="Chain" parent="." unique_id=774651494 instance=ExtResource("2_sugp2")]
+camera_enabled = true
 
-[node name="GodotIcon" parent="." unique_id=654798049 instance=ExtResource("5_icon")]
+[node name="collision" type="Node2D" parent="." unique_id=1474292432]
+visible = false
+
+[node name="Boundary" parent="collision" unique_id=1925561684 instance=ExtResource("5_boundary")]
+
+[node name="GodotIcon" parent="collision" unique_id=654798049 instance=ExtResource("5_icon")]
 boundary_shape = 2
 boundary_type = 1
-
-[node name="Boundary" parent="." unique_id=1925561684 instance=ExtResource("5_boundary")]
 
 [node name="Pointer" parent="." unique_id=38199738 instance=ExtResource("3_pointer")]
 layout_mode = 1
