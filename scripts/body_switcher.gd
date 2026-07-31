@@ -3,7 +3,7 @@ extends Node2D
 
 
 @export var starting_body_index: int = 0
-@export var body_name_menu_path: NodePath = ^"../../UI/BodyName"
+@export var body_name_menu_path: NodePath = ^"../../UI/Controls/BodyName"
 
 @export_group("Debug")
 @export var debug_chain: bool = false:

@@ -20,7 +20,7 @@ func _run() -> void:
 		_fail("main scene did not initialize all switchable bodies")
 		_finish(main_scene)
 		return
-	_assert_body_menu(main_scene.get_node("UI/BodyName") as MenuButton, switcher)
+	_assert_body_menu(main_scene.get_node("UI/Controls/BodyName") as MenuButton, switcher)
 	await _assert_control_debug_overlay(main_scene)
 
 	paused = true

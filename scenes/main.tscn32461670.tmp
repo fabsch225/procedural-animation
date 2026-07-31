@@ -35,6 +35,7 @@ color = Color(0.152941, 0.176471, 0.203922, 1)
 
 [node name="bodies" type="Node2D" parent="World" unique_id=902427454]
 script = ExtResource("9_body_switcher")
+body_name_menu_path = NodePath("../../UI/Controls/BodyName")
 
 [node name="Chain" parent="World/bodies" unique_id=87645108 instance=ExtResource("2_sugp2")]
 
@@ -67,11 +68,9 @@ override_hotspot = Vector2(16, 8)
 [node name="Controls" type="Control" parent="UI" unique_id=1599957405]
 modulate = Color(1, 1, 1, 0.8)
 layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
 mouse_filter = 2
 
 [node name="BodyName" type="MenuButton" parent="UI/Controls" unique_id=2107912263]
@@ -81,9 +80,9 @@ anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 16.0
-offset_top = -64.0
+offset_top = 544.0
 offset_right = 166.0
-offset_bottom = -16.0
+offset_bottom = 592.0
 grow_vertical = 0
 tooltip_text = "Select body (mouse wheel also cycles)"
 focus_mode = 0
@@ -106,10 +105,10 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -84.0
-offset_top = -84.0
-offset_right = -16.0
-offset_bottom = -16.0
+offset_left = 1028.0
+offset_top = 524.0
+offset_right = 1096.0
+offset_bottom = 592.0
 grow_horizontal = 0
 grow_vertical = 0
 focus_mode = 0
@@ -123,7 +122,8 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -100.0
+offset_left = 1012.0
+offset_right = 1112.0
 offset_bottom = 100.0
 grow_horizontal = 0
 focus_mode = 0

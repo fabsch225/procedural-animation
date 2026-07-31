@@ -21,6 +21,7 @@ func _run() -> void:
 	_assert_paused(main_scene, true, "Space")
 	_send_key(main_scene, KEY_ESCAPE)
 	_assert_paused(main_scene, false, "Escape")
+	_assert_pause_button(main_scene)
 	_assert_action_tooltips(main_scene)
 
 	paused = false
@@ -55,12 +56,31 @@ func _assert_action_tooltips(main_scene: Node) -> void:
 		&"_get_action_hotkey_text", &"fullscreen"
 	)
 	var pause_hotkey: String = main_scene.call(&"_get_action_hotkey_text", &"pause")
-	var fullscreen_button := main_scene.get_node("UI/FullscreenButton") as TextureButton
-	var pause_indicator := main_scene.get_node("Pause/pause") as TextureRect
+	var fullscreen_button := main_scene.get_node(
+		"UI/Controls/FullscreenButton"
+	) as TextureButton
+	var pause_button := main_scene.get_node("UI/Controls/PauseButton") as TextureButton
 	if not fullscreen_button.tooltip_text.ends_with("(%s)" % fullscreen_hotkey):
 		_fail("fullscreen tooltip did not use its Input Map binding")
-	if not pause_indicator.tooltip_text.ends_with("(%s)" % pause_hotkey):
+	if not pause_button.tooltip_text.ends_with("(%s)" % pause_hotkey):
 		_fail("pause tooltip did not use its Input Map bindings")
+
+
+func _assert_pause_button(main_scene: Node) -> void:
+	var pause_button := main_scene.get_node("UI/Controls/PauseButton") as TextureButton
+	if pause_button == null or not pause_button.visible:
+		_fail("pause button was not available while unpaused")
+		return
+	if pause_button.texture_normal.resource_path.get_file() != "pause.png" \
+			or not pause_button.tooltip_text.begins_with("Pause "):
+		_fail("unpaused pause button did not show its pause state")
+	pause_button.pressed.emit()
+	_assert_paused(main_scene, true, "pause button")
+	if pause_button.texture_normal.resource_path.get_file() != "open.png" \
+			or not pause_button.tooltip_text.begins_with("Unpause "):
+		_fail("paused pause button did not show its unpause state")
+	pause_button.pressed.emit()
+	_assert_paused(main_scene, false, "second pause button click")
 
 
 func _send_key(main_scene: Node, keycode: Key) -> void:
