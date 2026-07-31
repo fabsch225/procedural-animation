@@ -52,10 +52,9 @@ var stroke_triangles: PackedVector2Array = stroker.tessellate(
 ```
 
 Snake, Fish, and Lizard use the non-zero tessellator for their curved bodies
-and fins. Lizard's `Native Cubic` arm renderer uses the cubic stroker; its
-`Legacy Polyline` mode remains available for direct comparison. If the native
-classes are unavailable, Godot reports an error; lizard limbs fall back to the
-legacy renderer so they remain visible.
+and fins. Lizard limbs use the cubic stroker. If either native class is
+unavailable, Godot reports an error instead of silently selecting a different
+renderer.
 
 ## Test
 
@@ -63,12 +62,12 @@ Run the native correctness tests from the project root with:
 
 ```powershell
 & 'C:\Godot\4.7\engine\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe' `
-    --headless --path . `
-    --script res://tests/non_zero_path_tessellator_native_test.gd
+	--headless --path . `
+	--script res://tests/non_zero_path_tessellator_native_test.gd
 
 & 'C:\Godot\4.7\engine\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe' `
-    --headless --path . `
-    --script res://tests/cubic_stroke_tessellator_native_test.gd
+	--headless --path . `
+	--script res://tests/cubic_stroke_tessellator_native_test.gd
 ```
 
 ## What Godot needs at runtime

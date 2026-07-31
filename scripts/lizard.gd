@@ -7,11 +7,6 @@ const ARM_COUNT: int = 4
 const ARM_JOINT_COUNT: int = 3
 const PROCESSING_REFERENCE_FPS: float = 60.0
 
-enum ArmRenderMode {
-	NATIVE_CUBIC,
-	LEGACY_POLYLINE,
-}
-
 @export_group("Lizard Appearance")
 @export var body_widths: Array[float] = [
 	52.0, 58.0, 40.0, 60.0, 68.0, 71.0, 65.0,
@@ -30,7 +25,6 @@ enum ArmRenderMode {
 @export_range(0.0, 128.0, 1.0) var rear_elbow_offset: float = 30.0
 
 @export_group("Arm Rendering")
-@export var arm_render_mode: ArmRenderMode = ArmRenderMode.NATIVE_CUBIC
 @export_range(0.01, 2.0, 0.01) var native_arm_curve_tolerance: float = 0.2
 @export_range(1, 12, 1) var native_arm_max_depth: int = 12
 @export_range(0, 64, 1) var native_arm_circle_segments: int = 0
@@ -103,20 +97,14 @@ func _draw_arms() -> void:
 		elif i == 3:
 			elbow += perpendicular
 
-		if arm_render_mode == ArmRenderMode.NATIVE_CUBIC:
-			if _draw_native_cubic_arm(shoulder, elbow, foot):
-				continue
-
-		var path := _build_arm_path(shoulder, elbow, foot)
-		_draw_round_capped_polyline(path, outline_color, arm_outline_width)
-		_draw_round_capped_polyline(path, body_color, arm_width)
+		_draw_native_cubic_arm(shoulder, elbow, foot)
 
 
 func _draw_native_cubic_arm(
 	shoulder: Vector2,
 	elbow: Vector2,
 	foot: Vector2
-) -> bool:
+) -> void:
 	var outline_triangles := PackedVector2Array()
 	var body_triangles := PackedVector2Array()
 	if arm_outline_width > 0.0:
@@ -124,17 +112,16 @@ func _draw_native_cubic_arm(
 			shoulder, elbow, foot, arm_outline_width
 		)
 		if outline_triangles.is_empty():
-			return false
+			return
 	if arm_width > 0.0:
 		body_triangles = _tessellate_native_cubic_stroke(
 			shoulder, elbow, foot, arm_width
 		)
 		if body_triangles.is_empty():
-			return false
+			return
 
 	_draw_colored_triangles(outline_triangles, outline_color)
 	_draw_colored_triangles(body_triangles, body_color)
-	return true
 
 
 func _tessellate_native_cubic_stroke(
@@ -162,8 +149,8 @@ func _tessellate_native_cubic_stroke(
 			return result as PackedVector2Array
 	if not _native_cubic_stroker_error_reported:
 		push_error(
-			"Native cubic stroker is unavailable for %s. Falling back to the " % body_name
-			+ "legacy polyline renderer. Build native/non_zero_tessellator first."
+			"Native cubic stroker is unavailable for %s. Build " % body_name
+			+ "native/non_zero_tessellator before using this body."
 		)
 		_native_cubic_stroker_error_reported = true
 	return PackedVector2Array()
@@ -193,27 +180,6 @@ func _draw_colored_triangles(triangles: PackedVector2Array, color: Color) -> voi
 	RenderingServer.canvas_item_add_triangle_array(
 		get_canvas_item(), indices, triangles, colors
 	)
-
-
-func _draw_round_capped_polyline(
-	path: PackedVector2Array,
-	color: Color,
-	width: float
-) -> void:
-	if path.size() < 2 or width <= 0.0:
-		return
-	draw_polyline(path, color, width, true)
-	var cap_radius := width * 0.5
-	draw_circle(path[0], cap_radius, color, true, -1.0, true)
-	draw_circle(path[-1], cap_radius, color, true, -1.0, true)
-
-
-func _build_arm_path(shoulder: Vector2, elbow: Vector2, foot: Vector2) -> PackedVector2Array:
-	var shape := _new_processing_shape()
-	shape.begin_shape()
-	shape.vertex(shoulder)
-	shape.bezier_vertex(elbow, elbow, foot)
-	return shape.end_shape()
 
 
 func _build_body_outline() -> PackedVector2Array:
