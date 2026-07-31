@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://25vkagkvs2u2"]
+
+[ext_resource type="Script" uid="uid://bod2rj0cqt7yq" path="res://scripts/world_boundary.gd" id="1_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_root"]
+size = Vector2(1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_top"]
+size = Vector2(1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bottom"]
+size = Vector2(1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_left"]
+size = Vector2(1, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_right"]
+size = Vector2(1, 1)
+
+[node name="Boundary" type="StaticBody2D" unique_id=1020196383]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_script")
+boundary_type = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=551314949]
+shape = SubResource("RectangleShape2D_root")
+
+[node name="Top" type="StaticBody2D" parent="." unique_id=414732164]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Top" unique_id=1884514952]
+shape = SubResource("RectangleShape2D_top")
+
+[node name="Bottom" type="StaticBody2D" parent="." unique_id=851311252]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bottom" unique_id=265915867]
+shape = SubResource("RectangleShape2D_bottom")
+
+[node name="Left" type="StaticBody2D" parent="." unique_id=2099541184]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Left" unique_id=1392592203]
+shape = SubResource("RectangleShape2D_left")
+
+[node name="Right" type="StaticBody2D" parent="." unique_id=1100546218]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Right" unique_id=1844557456]
+shape = SubResource("RectangleShape2D_right")

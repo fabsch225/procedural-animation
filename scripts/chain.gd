@@ -92,6 +92,20 @@ func constrain_against_circle(center: Vector2, radius: float) -> void:
 		joints[i] = center + offset.normalized() * radius
 
 
+# Prevents adjacent joints from compressing below a chosen distance.
+func constrain_minimum_joint_distance(minimum_distance: float) -> void:
+	for i in range(1, joints.size()):
+		var offset := joints[i] - joints[i - 1]
+
+		if offset.length_squared() >= minimum_distance * minimum_distance:
+			continue
+
+		if is_zero_approx(offset.length_squared()):
+			offset = Vector2.RIGHT.rotated(angles[i])
+
+		joints[i] = joints[i - 1] + offset.normalized() * minimum_distance
+
+
 func _closest_point_on_polygon(point: Vector2, polygon: PackedVector2Array) -> Vector2:
 	var closest_point := polygon[0]
 	var closest_distance_squared := INF
