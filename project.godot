@@ -25,6 +25,7 @@ gdscript/warnings/enable=false
 
 [display]
 
+window/size/always_on_top=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
