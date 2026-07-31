@@ -1,7 +1,11 @@
 [gd_scene format=3 uid="uid://dfpc310xa1rtg"]
 
-[ext_resource type="PackedScene" uid="uid://cqep44rcom57l" path="res://animals/chain/chain.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://cofs7gyfld42t" path="res://animals/snake/snake.tscn" id="1_ig7tw"]
 
 [node name="main" type="Node2D" unique_id=1152084155]
 
-[node name="Chain" parent="." unique_id=1958895362 instance=ExtResource("1_ig7tw")]
+[node name="Snake" parent="." unique_id=1474772772 instance=ExtResource("1_ig7tw")]
+head_width = 45.0
+second_width = 38.0
+tail_width = 8.0
+eye_forward_offset = 12.0

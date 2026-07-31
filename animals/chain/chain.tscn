@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://cqep44rcom57l"]
-
-[ext_resource type="Script" uid="uid://cnc5bu3qb7biv" path="res://animals/chain/chain.gd" id="1_pqad8"]
-
-[node name="Chain" type="Node2D" unique_id=1958895362]
-script = ExtResource("1_pqad8")
