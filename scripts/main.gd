@@ -3,9 +3,12 @@ extends Node
 
 @export var hide_mouse_cursor: bool = false
 
+@onready var pause_layer: CanvasLayer = $Pause
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	pause_layer.visible = get_tree().paused
 	Input.mouse_mode = (
 		Input.MOUSE_MODE_HIDDEN
 		if hide_mouse_cursor
@@ -30,6 +33,7 @@ func _input(event: InputEvent) -> void:
 
 func toggle_pause() -> void:
 	get_tree().paused = not get_tree().paused
+	pause_layer.visible = get_tree().paused
 
 
 func consume_input() -> void:

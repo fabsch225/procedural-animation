@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cb7aweeon33nh" path="res://ui/pointers/2_double/cursor_none.png" id="4_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://25vkagkvs2u2" path="res://scenes/world_boundary.tscn" id="5_boundary"]
 [ext_resource type="PackedScene" uid="uid://cah1xwm4r5u60" path="res://scenes/godot_icon.tscn" id="5_icon"]
+[ext_resource type="Texture2D" uid="uid://bytluw8ilt0fr" path="res://ui/icons/pause.png" id="7_o6xl0"]
 
 [node name="main" type="Node" unique_id=1152084155]
 script = ExtResource("1_0wfyh")
@@ -25,14 +26,13 @@ color = Color(0.152941, 0.176471, 0.203922, 1)
 [node name="World" type="Node2D" parent="." unique_id=961891458]
 
 [node name="Chain" parent="World" unique_id=774651494 instance=ExtResource("2_sugp2")]
-camera_enabled = true
 
 [node name="collision" type="Node2D" parent="World" unique_id=1474292432]
 
 [node name="Boundary" parent="World/collision" unique_id=1925561684 instance=ExtResource("5_boundary")]
-visible = false
 
 [node name="GodotIcon" parent="World/collision" unique_id=654798049 instance=ExtResource("5_icon")]
+visible = false
 boundary_shape = 2
 boundary_type = 1
 
@@ -57,3 +57,15 @@ theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 24
 text = "chain"
+
+[node name="Pause" type="CanvasLayer" parent="." unique_id=1316151990]
+
+[node name="pause" type="TextureRect" parent="Pause" unique_id=708549155]
+modulate = Color(1, 1, 1, 0.5)
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -100.0
+offset_bottom = 100.0
+grow_horizontal = 0
+texture = ExtResource("7_o6xl0")
