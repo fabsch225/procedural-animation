@@ -39,6 +39,12 @@ func curve_vertex(point: Vector2) -> void:
 	)
 
 
+func bezier_vertex(control_1: Vector2, control_2: Vector2, anchor: Vector2) -> void:
+	_assert_shape_started()
+	assert(not _path.is_empty(), "vertex() must establish an anchor before bezier_vertex()")
+	_append_cubic(_path[-1], control_1, control_2, anchor)
+
+
 func end_shape(close: bool = false) -> PackedVector2Array:
 	_assert_shape_started()
 	_shape_started = false
@@ -56,19 +62,22 @@ func _append_curve_segment(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) -
 
 	if _path.is_empty():
 		_path.append(p1)
+	_append_cubic(p1, control_1, control_2, p2)
 
+
+func _append_cubic(p0: Vector2, p1: Vector2, p2: Vector2, p3: Vector2) -> void:
 	if adaptive_curve_flattening:
-		_append_cubic_adaptive(p1, control_1, control_2, p2, 0)
+		_append_cubic_adaptive(p0, p1, p2, p3, 0)
 		return
 
 	for step in range(1, curve_resolution + 1):
 		var weight := float(step) / float(curve_resolution)
 		var inverse := 1.0 - weight
 		_path.append(
-			inverse * inverse * inverse * p1
-			+ 3.0 * inverse * inverse * weight * control_1
-			+ 3.0 * inverse * weight * weight * control_2
-			+ weight * weight * weight * p2
+			inverse * inverse * inverse * p0
+			+ 3.0 * inverse * inverse * weight * p1
+			+ 3.0 * inverse * weight * weight * p2
+			+ weight * weight * weight * p3
 		)
 
 

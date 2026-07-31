@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://bytluw8ilt0fr" path="res://ui/icons/pause.png" id="7_o6xl0"]
 [ext_resource type="PackedScene" path="res://scenes/snake.tscn" id="8_snake"]
 [ext_resource type="Script" uid="uid://do4xn3vnf4fod" path="res://scripts/body_switcher.gd" id="9_body_switcher"]
+[ext_resource type="PackedScene" path="res://scenes/fish.tscn" id="10_fish"]
 
 [node name="main" type="Node" unique_id=1152084155]
 script = ExtResource("1_0wfyh")
@@ -32,6 +33,9 @@ script = ExtResource("9_body_switcher")
 
 [node name="Snake" parent="World/bodies" unique_id=1145853825 instance=ExtResource("8_snake")]
 body_render_mode = 1
+outline_mode = 1
+
+[node name="Fish" parent="World/bodies" unique_id=1504660315 instance=ExtResource("10_fish")]
 
 [node name="Chain" parent="World/bodies" unique_id=87645108 instance=ExtResource("2_sugp2")]
 
