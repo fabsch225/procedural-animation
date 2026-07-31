@@ -21,8 +21,31 @@ func _init(
 	angles.append(0.0)
 
 	for i in range(1, joint_count):
-		joints.append(joints[i - 1] + Vector2(0.0, link_size))
+		joints.append(origin)
 		angles.append(0.0)
+
+	# Keep the initial joint positions consistent with the initial angles. The
+	# Processing constructor used vertical positions with zero-valued angles,
+	# which is harmless after its first update but produces a malformed body if
+	# it is displayed before that update (for example, while paused).
+	set_curved_pose(origin)
+
+
+# Places the complete chain immediately into a valid pose. `heading` is the
+# head's forward direction and `joint_bend` is the angle added by each link.
+func set_curved_pose(
+	head_position: Vector2,
+	heading: float = 0.0,
+	joint_bend: float = 0.0
+) -> void:
+	if joints.is_empty():
+		return
+
+	joints[0] = head_position
+	angles[0] = Util.simplify_angle(heading)
+	for i in range(1, joints.size()):
+		angles[i] = Util.simplify_angle(heading + joint_bend * float(i))
+		joints[i] = joints[i - 1] - Vector2.from_angle(angles[i]) * link_size
 
 
 # Resolves the chain toward a target while limiting adjacent joint angles.

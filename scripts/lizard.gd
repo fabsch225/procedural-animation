@@ -41,8 +41,17 @@ func _on_spine_created() -> void:
 	arm_desired.clear()
 	for i in range(ARM_COUNT):
 		var arm_link_size := front_arm_link_size if i < 2 else rear_arm_link_size
-		arms.append(Chain.new(spine.joints[0], ARM_JOINT_COUNT, arm_link_size))
-		arm_desired.append(Vector2.ZERO)
+		var arm := Chain.new(spine.joints[0], ARM_JOINT_COUNT, arm_link_size)
+		var desired_position := _arm_desired_position(i)
+		var shoulder := _arm_shoulder_position(i)
+		var arm_heading := (desired_position - shoulder).angle()
+		arm.set_curved_pose(desired_position, arm_heading)
+		# A few creation-only passes settle both endpoints before the first draw.
+		# Runtime motion keeps the original one-pass-per-frame Processing behavior.
+		for _iteration in range(4):
+			arm.fabrik_resolve(desired_position, shoulder)
+		arms.append(arm)
+		arm_desired.append(desired_position)
 
 
 func _after_spine_resolved(delta: float) -> void:
@@ -55,20 +64,26 @@ func _after_spine_resolved(delta: float) -> void:
 		maxf(delta, 0.0) * PROCESSING_REFERENCE_FPS
 	)
 	for i in range(arms.size()):
-		var side := 1.0 if i % 2 == 0 else -1.0
-		var body_index := 3 if i < 2 else 7
-		var reach_angle := PI / 4.0 if i < 2 else PI / 3.0
-		var desired_position := _body_position(
-			body_index, reach_angle * side, foot_reach
-		)
+		var desired_position := _arm_desired_position(i)
 		if desired_position.distance_to(arm_desired[i]) > step_distance:
 			arm_desired[i] = desired_position
 
 		var moving_foot := arms[i].joints[0].lerp(arm_desired[i], step_weight)
-		var shoulder := _body_position(
-			body_index, PI / 2.0 * side, -shoulder_inset
-		)
+		var shoulder := _arm_shoulder_position(i)
 		arms[i].fabrik_resolve(moving_foot, shoulder)
+
+
+func _arm_desired_position(index: int) -> Vector2:
+	var side := 1.0 if index % 2 == 0 else -1.0
+	var body_index := 3 if index < 2 else 7
+	var reach_angle := PI / 4.0 if index < 2 else PI / 3.0
+	return _body_position(body_index, reach_angle * side, foot_reach)
+
+
+func _arm_shoulder_position(index: int) -> Vector2:
+	var side := 1.0 if index % 2 == 0 else -1.0
+	var body_index := 3 if index < 2 else 7
+	return _body_position(body_index, PI / 2.0 * side, -shoulder_inset)
 
 
 func _draw_chain_body() -> void:

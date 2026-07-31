@@ -12,6 +12,8 @@ extends Node2D
 @export_range(0.0, TAU, 0.01, "radians") var angle_constraint: float = PI / 8.0
 @export_range(1.0, 2000.0, 1.0) var movement_speed: float = 480.0
 @export var start_at_viewport_center: bool = true
+@export_range(-PI, PI, 0.01, "radians") var initial_heading: float = 0.0
+@export_range(-PI / 2.0, PI / 2.0, 0.01, "radians") var initial_joint_bend: float = 0.06
 
 @export_group("Shared Appearance")
 @export var body_color: Color = Color.WHITE
@@ -51,6 +53,10 @@ func _ready() -> void:
 			* get_viewport_rect().get_center()
 		)
 	spine = Chain.new(origin, joint_count, link_size, angle_constraint)
+	var constrained_initial_bend := clampf(
+		initial_joint_bend, -angle_constraint, angle_constraint
+	)
+	spine.set_curved_pose(origin, initial_heading, constrained_initial_bend)
 	_on_spine_created()
 	queue_redraw()
 
@@ -58,6 +64,7 @@ func _ready() -> void:
 func activate() -> void:
 	visible = true
 	process_mode = Node.PROCESS_MODE_PAUSABLE
+	queue_redraw()
 
 
 func deactivate() -> void:
