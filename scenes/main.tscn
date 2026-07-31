@@ -28,6 +28,7 @@ color = Color(0.152941, 0.176471, 0.203922, 1)
 [node name="bodies" type="Node2D" parent="World" unique_id=902427454]
 
 [node name="Snake" parent="World/bodies" unique_id=1145853825 instance=ExtResource("8_snake")]
+outline_mode = 1
 
 [node name="collision" type="Node2D" parent="World" unique_id=1474292432]
 

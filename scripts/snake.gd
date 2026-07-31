@@ -2,6 +2,11 @@ class_name Snake
 extends Node2D
 
 
+enum OutlineMode {
+	SILHOUETTE,
+	OVERLAPPING,
+}
+
 @export_group("Movement")
 @export_range(2, 128, 1) var joint_count: int = 48
 @export_range(1.0, 200.0, 1.0) var link_size: float = 64.0
@@ -12,6 +17,7 @@ extends Node2D
 @export_group("Appearance")
 @export var body_color: Color = Color8(172, 57, 49)
 @export var outline_color: Color = Color.WHITE
+@export var outline_mode: OutlineMode = OutlineMode.SILHOUETTE
 @export_range(0.0, 32.0, 0.5) var outline_width: float = 4.0
 @export_range(1, 8, 1) var curve_subdivisions: int = 3
 @export_range(1.0, 64.0, 1.0) var eye_radius: float = 12.0
@@ -47,27 +53,69 @@ func _draw() -> void:
 	var samples := _build_body_samples()
 	# Every piece is convex, so self-crossings never require triangulating one
 	# large, self-intersecting outline. Draw from tail to head for stable overlap.
-	for i in range(samples.size() - 2, -1, -1):
-		_draw_tapered_capsule(
-			samples[i].position,
-			samples[i + 1].position,
-			samples[i].radius,
-			samples[i + 1].radius,
-			outline_color
-		)
-
-	for i in range(samples.size() - 2, -1, -1):
-		_draw_tapered_capsule(
-			samples[i].position,
-			samples[i + 1].position,
-			maxf(0.0, samples[i].radius - outline_width),
-			maxf(0.0, samples[i + 1].radius - outline_width),
-			body_color
-		)
+	if outline_mode == OutlineMode.SILHOUETTE:
+		_draw_body(samples, 0.0, outline_color)
+		_draw_body(samples, outline_width, body_color)
+	else:
+		_draw_body(samples, 0.0, body_color)
+		_draw_overlapping_outline(samples)
 
 	_draw_eyes()
 	if debug_chain:
 		spine.draw(self)
+
+
+func _draw_body(samples: Array[BodySample], inset: float, color: Color) -> void:
+	for i in range(samples.size() - 2, -1, -1):
+		_draw_tapered_capsule(
+			samples[i].position,
+			samples[i + 1].position,
+			maxf(0.0, samples[i].radius - inset),
+			maxf(0.0, samples[i + 1].radius - inset),
+			color
+		)
+
+
+func _draw_overlapping_outline(samples: Array[BodySample]) -> void:
+	if outline_width <= 0.0:
+		return
+
+	var outline := PackedVector2Array()
+	var last_sample := samples.size() - 1
+
+	# First side, from head to tail.
+	for i in range(samples.size()):
+		outline.append(samples[i].position + _sample_normal(samples, i) * samples[i].radius)
+
+	# Rounded tail, continuing around the end of the centerline.
+	var tail_normal := _sample_normal(samples, last_sample)
+	var tail_angle := tail_normal.angle()
+	for step in range(1, 9):
+		var angle := tail_angle + PI * float(step) / 8.0
+		outline.append(samples[last_sample].position + Vector2.from_angle(angle) * samples[last_sample].radius)
+
+	# Opposite side, from tail back to head.
+	for i in range(last_sample - 1, -1, -1):
+		outline.append(samples[i].position - _sample_normal(samples, i) * samples[i].radius)
+
+	# Rounded head. Going through the reverse tangent closes the outer contour.
+	var head_normal := _sample_normal(samples, 0)
+	var head_angle := (-head_normal).angle()
+	for step in range(1, 9):
+		var angle := head_angle + PI * float(step) / 8.0
+		outline.append(samples[0].position + Vector2.from_angle(angle) * samples[0].radius)
+
+	outline.append(outline[0])
+	draw_polyline(outline, outline_color, outline_width, true)
+
+
+func _sample_normal(samples: Array[BodySample], index: int) -> Vector2:
+	var previous := samples[maxi(0, index - 1)].position
+	var next := samples[mini(samples.size() - 1, index + 1)].position
+	var tangent := next - previous
+	if tangent.is_zero_approx():
+		return Vector2.UP
+	return tangent.normalized().orthogonal()
 
 
 func _build_body_samples() -> Array[BodySample]:
