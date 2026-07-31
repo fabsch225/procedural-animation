@@ -31,7 +31,7 @@ color = Color(0.152941, 0.176471, 0.203922, 1)
 script = ExtResource("9_body_switcher")
 
 [node name="Snake" parent="World/bodies" unique_id=1145853825 instance=ExtResource("8_snake")]
-body_render_mode = 2
+body_render_mode = 3
 outline_mode = 1
 
 [node name="Chain" parent="World/bodies" unique_id=87645108 instance=ExtResource("2_sugp2")]

@@ -11,6 +11,7 @@ enum BodyRenderMode {
 	GODOT_RIBBON,
 	PROCESSING_CURVE,
 	PROCESSING_VECTOR_FILL,
+	PROCESSING_VECTOR_FILL_NATIVE,
 }
 
 @export_group("Body")
@@ -37,6 +38,9 @@ enum BodyRenderMode {
 @export var debug_chain: bool = false
 
 var spine: Chain
+var _native_tessellator: Object
+var _native_tessellator_checked: bool = false
+var _native_fallback_reported: bool = false
 
 
 func _ready() -> void:
@@ -78,8 +82,11 @@ func _draw() -> void:
 		return
 
 	var samples := _build_body_samples()
-	if body_render_mode == BodyRenderMode.PROCESSING_VECTOR_FILL:
-		_draw_processing_vector_body()
+	if body_render_mode == BodyRenderMode.PROCESSING_VECTOR_FILL \
+			or body_render_mode == BodyRenderMode.PROCESSING_VECTOR_FILL_NATIVE:
+		_draw_processing_vector_body(
+			body_render_mode == BodyRenderMode.PROCESSING_VECTOR_FILL_NATIVE
+		)
 		_draw_eyes()
 		if debug_chain:
 			spine.draw(self)
@@ -115,9 +122,9 @@ func _draw_processing_body(samples: Array[BodySample]) -> void:
 		draw_polyline(path, outline_color, outline_width, true)
 
 
-func _draw_processing_vector_body() -> void:
+func _draw_processing_vector_body(use_native_tessellator: bool = false) -> void:
 	var path := _build_processing_outline()
-	var triangles := NonZeroPathTessellator2D.tessellate(path)
+	var triangles := _tessellate_processing_path(path, use_native_tessellator)
 
 	if not triangles.is_empty():
 		var indices := PackedInt32Array()
@@ -134,6 +141,48 @@ func _draw_processing_vector_body() -> void:
 
 	if path.size() >= 2 and outline_width > 0.0:
 		draw_polyline(path, outline_color, outline_width, true)
+
+
+func _tessellate_processing_path(
+	path: PackedVector2Array,
+	use_native_tessellator: bool
+) -> PackedVector2Array:
+	if use_native_tessellator:
+		var native := _get_native_tessellator()
+		if native != null:
+			var result: Variant = native.call(&"tessellate", path)
+			if result is PackedVector2Array:
+				return result as PackedVector2Array
+		if not _native_fallback_reported:
+			push_warning(
+				"Native snake tessellator is unavailable; using the GDScript backup. "
+				+ "Build native/non_zero_tessellator first."
+			)
+			_native_fallback_reported = true
+
+	return NonZeroPathTessellator2D.tessellate(path)
+
+
+func _get_native_tessellator() -> Object:
+	if is_instance_valid(_native_tessellator):
+		return _native_tessellator
+	if _native_tessellator_checked:
+		return null
+
+	_native_tessellator_checked = true
+	if ClassDB.class_exists(&"NonZeroPathTessellatorNative"):
+		_native_tessellator = ClassDB.instantiate(&"NonZeroPathTessellatorNative")
+	return _native_tessellator
+
+
+func get_active_tessellator_backend() -> StringName:
+	match body_render_mode:
+		BodyRenderMode.PROCESSING_VECTOR_FILL:
+			return &"gdscript"
+		BodyRenderMode.PROCESSING_VECTOR_FILL_NATIVE:
+			return &"gdextension" if _get_native_tessellator() != null else &"gdscript_fallback"
+		_:
+			return &"not_applicable"
 
 
 func _build_processing_outline() -> PackedVector2Array:
