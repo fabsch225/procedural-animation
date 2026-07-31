@@ -8,3 +8,5 @@ reloadable = true
 
 windows.debug.x86_64 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.windows.template_debug.x86_64.dll"
 windows.release.x86_64 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.windows.template_release.x86_64.dll"
+web.debug.wasm32 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.web.template_debug.wasm32.nothreads.wasm"
+web.release.wasm32 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.web.template_release.wasm32.nothreads.wasm"

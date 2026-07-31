@@ -7,3 +7,5 @@
 /native/non_zero_tessellator/.sconsign.dblite
 /native/non_zero_tessellator/bin/*.exp
 /native/non_zero_tessellator/bin/*.lib
+/native/non_zero_tessellator/bin/~*.TMP
+/native/non_zero_tessellator/src/*.o

@@ -39,6 +39,30 @@ The `.gdextension` resource loads the correct debug or release DLL from
 `bin/`. Godot discovers `.gdextension` resources automatically when the
 project opens; there is no plugin checkbox to enable.
 
+## Build for Web
+
+The Web build uses the Emscripten version from Godot 4.7.1's official build
+configuration (`4.0.11`) and produces a non-threaded `wasm32` side module to
+match this project's Web export preset:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build_web.ps1
+```
+
+On its first run, the script installs the pinned Emscripten SDK under
+`%LOCALAPPDATA%\Godot\emsdk`. Set `EMSDK`, or pass `-EmsdkPath`, to use an
+existing SDK checkout instead. Build a debug side module with:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build_web.ps1 `
+	-Target template_debug
+```
+
+Web exports must have **Extensions Support** enabled and use Godot's matching
+dynamic-link export template. Both are configured on the project's `Web`
+export preset. The `.gdextension` resource maps Web debug and release exports
+to their corresponding `.nothreads.wasm` side modules.
+
 ## Use from GDScript
 
 ```gdscript
@@ -74,7 +98,8 @@ Run the native correctness tests from the project root with:
 
 Godot discovers `non_zero_path_tessellator.gdextension` automatically. The
 descriptor names the native class entry point and maps debug/release builds to
-their DLLs. There is no editor plugin to enable and no autoload to add.
+their Windows DLLs and WebAssembly side modules. There is no editor plugin to
+enable and no autoload to add.
 
 If the C++ source changes, rerun the appropriate build command and restart the
 editor if Windows has the DLL locked. Scene and GDScript changes do not require
