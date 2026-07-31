@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c3ncl8gdsnbqf"
-path="res://.godot/imported/exclamation.png-3eade21102a598ea4d969e6d739172cb.ctex"
+uid="uid://5y5fb65n2gxn"
+path="res://.godot/imported/scrollHorizontal.png-dae9231c0941ee58989f5ba6b681317a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/icons/exclamation.png"
-dest_files=["res://.godot/imported/exclamation.png-3eade21102a598ea4d969e6d739172cb.ctex"]
+source_file="res://ui/icons/2x/scrollHorizontal.png"
+dest_files=["res://.godot/imported/scrollHorizontal.png-dae9231c0941ee58989f5ba6b681317a.ctex"]
 
 [params]
 

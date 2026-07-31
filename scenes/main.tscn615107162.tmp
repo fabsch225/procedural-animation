@@ -6,14 +6,12 @@
 [ext_resource type="Texture2D" uid="uid://cb7aweeon33nh" path="res://ui/pointers/2_double/cursor_none.png" id="4_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://25vkagkvs2u2" path="res://scenes/world_boundary.tscn" id="5_boundary"]
 [ext_resource type="PackedScene" uid="uid://cah1xwm4r5u60" path="res://scenes/godot_icon.tscn" id="5_icon"]
+[ext_resource type="Texture2D" path="res://ui/icons/pause.png" id="7_o6xl0"]
 [ext_resource type="PackedScene" path="res://scenes/snake.tscn" id="8_snake"]
 [ext_resource type="Script" uid="uid://do4xn3vnf4fod" path="res://scripts/body_switcher.gd" id="9_body_switcher"]
 [ext_resource type="PackedScene" path="res://scenes/fish.tscn" id="10_fish"]
-[ext_resource type="Texture2D" uid="uid://5y5fb65n2gxn" path="res://ui/icons/2x/scrollHorizontal.png" id="11_a8y0u"]
 [ext_resource type="PackedScene" path="res://scenes/lizard.tscn" id="11_lizard"]
-[ext_resource type="Texture2D" uid="uid://bytluw8ilt0fr" path="res://ui/icons/2x/pause.png" id="12_eb6dy"]
-[ext_resource type="Texture2D" uid="uid://7awadmo5x2b6" path="res://ui/icons/2x/larger.png" id="12_larger"]
-[ext_resource type="Script" uid="uid://bqnowoh1ho7bd" path="res://scripts/control_debug_overlay.gd" id="14_control_debug"]
+[ext_resource type="Texture2D" path="res://ui/icons/larger.png" id="12_larger"]
 
 [node name="main" type="Node" unique_id=1152084155]
 script = ExtResource("1_0wfyh")
@@ -61,30 +59,22 @@ boundary_type = 1
 [node name="Pointer" parent="UI" unique_id=38199738 instance=ExtResource("3_pointer")]
 hotswap_enabled = false
 override_cursor = ExtResource("4_jyhfs")
-override_hotspot = Vector2(16, 8)
 
-[node name="BodyName" type="MenuButton" parent="UI" unique_id=2107912263]
-custom_minimum_size = Vector2(150, 48)
+[node name="BodyName" type="Label" parent="UI" unique_id=2107912263]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 16.0
-offset_top = -64.0
-offset_right = 116.0
+offset_top = -48.0
+offset_right = 500.0
 offset_bottom = -16.0
 grow_vertical = 0
-tooltip_text = "Select body (mouse wheel also cycles)"
-focus_mode = 0
-mouse_default_cursor_shape = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_focus_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.75)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
 theme_override_font_sizes/font_size = 24
 text = "chain"
-icon = ExtResource("11_a8y0u")
-alignment = 0
-expand_icon = true
 
 [node name="FullscreenButton" type="TextureButton" parent="UI" unique_id=26456824]
 custom_minimum_size = Vector2(68, 68)
@@ -116,7 +106,7 @@ anchor_right = 1.0
 offset_left = -100.0
 offset_bottom = 100.0
 grow_horizontal = 0
-texture = ExtResource("12_eb6dy")
+texture = ExtResource("7_o6xl0")
 
 [node name="DebugPanel" type="PanelContainer" parent="Pause" unique_id=955231251]
 custom_minimum_size = Vector2(260, 0)
@@ -126,7 +116,7 @@ anchor_right = 1.0
 offset_left = -276.0
 offset_top = 116.0
 offset_right = -16.0
-offset_bottom = 260.0
+offset_bottom = 208.0
 grow_horizontal = 0
 
 [node name="Margin" type="MarginContainer" parent="Pause/DebugPanel" unique_id=1192816322]
@@ -147,26 +137,5 @@ text = "Debug Options"
 
 [node name="DebugChain" type="CheckButton" parent="Pause/DebugPanel/Margin/Options" unique_id=1341762760]
 layout_mode = 2
-tooltip_text = "Show the internal spines of each body"
-mouse_default_cursor_shape = 2
 button_pressed = true
 text = "Show debug chain"
-
-[node name="UIBounds" type="CheckButton" parent="Pause/DebugPanel/Margin/Options" unique_id=2129898476]
-layout_mode = 2
-tooltip_text = "Outline visible Control nodes and show their live sizes"
-mouse_default_cursor_shape = 2
-text = "Show UI bounds"
-
-[node name="DebugOverlay" type="CanvasLayer" parent="." unique_id=290490654]
-layer = 100
-
-[node name="ControlBounds" type="Control" parent="DebugOverlay" unique_id=1568769684]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-script = ExtResource("14_control_debug")

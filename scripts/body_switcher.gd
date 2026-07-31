@@ -3,7 +3,7 @@ extends Node2D
 
 
 @export var starting_body_index: int = 0
-@export var body_name_label_path: NodePath = ^"../../UI/BodyName"
+@export var body_name_menu_path: NodePath = ^"../../UI/BodyName"
 
 @export_group("Debug")
 @export var debug_chain: bool = false:
@@ -13,12 +13,13 @@ extends Node2D
 
 var active_body_index: int = -1
 var bodies: Array[Node] = []
-@onready var body_name_label := get_node_or_null(body_name_label_path) as Label
+@onready var body_name_menu := get_node_or_null(body_name_menu_path) as MenuButton
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_refresh_bodies()
+	_setup_body_menu()
 	_apply_debug_chain_override()
 	if not bodies.is_empty():
 		activate_body(starting_body_index)
@@ -61,10 +62,29 @@ func activate_body(index: int) -> void:
 
 
 func _update_body_name() -> void:
-	if body_name_label == null or active_body_index < 0:
+	if body_name_menu == null or active_body_index < 0:
 		return
 
-	body_name_label.text = str(bodies[active_body_index].get("body_name"))
+	body_name_menu.text = str(bodies[active_body_index].get("body_name"))
+	var popup := body_name_menu.get_popup()
+	for item_index in range(popup.item_count):
+		popup.set_item_checked(
+			item_index, popup.get_item_id(item_index) == active_body_index
+		)
+
+
+func _setup_body_menu() -> void:
+	if body_name_menu == null:
+		return
+	var popup := body_name_menu.get_popup()
+	popup.clear()
+	for i in range(bodies.size()):
+		popup.add_radio_check_item(str(bodies[i].get("body_name")), i)
+	popup.id_pressed.connect(_on_body_menu_id_pressed)
+
+
+func _on_body_menu_id_pressed(id: int) -> void:
+	activate_body(id)
 
 
 func _refresh_bodies() -> void:

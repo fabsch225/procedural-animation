@@ -7,6 +7,10 @@ extends HotswapMouseCursor
 @export var override_cursor: Texture2D
 @export var override_hotspot: Vector2 = Vector2.ZERO
 
+@export_group("Pointing Hand Override")
+@export var pointing_hand_override: Texture2D
+@export var pointing_hand_hotspot: Vector2 = Vector2.ZERO
+
 @onready var file_name_label: Label = $FileNameLabel
 
 
@@ -21,6 +25,12 @@ func _ready() -> void:
 	else:
 		file_name_label.visible = false
 		_apply_override_cursor()
+	_apply_pointing_hand_override()
+
+
+func _exit_tree() -> void:
+	Input.set_custom_mouse_cursor(null, Input.CURSOR_POINTING_HAND)
+	super._exit_tree()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -35,6 +45,14 @@ func _apply_override_cursor() -> void:
 		file_name_label.text = override_cursor.resource_path.get_file()
 	else:
 		file_name_label.text = "System cursor"
+
+
+func _apply_pointing_hand_override() -> void:
+	Input.set_custom_mouse_cursor(
+		pointing_hand_override,
+		Input.CURSOR_POINTING_HAND,
+		pointing_hand_hotspot
+	)
 
 
 func _on_cursor_changed(cursor_path: String, _index: int) -> void:

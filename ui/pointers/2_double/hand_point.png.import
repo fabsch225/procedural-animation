@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dod14v5aqfok7"
-path="res://.godot/imported/musicOff.png-95bd8dae31b0b1f5b6b9621edb66cc49.ctex"
+uid="uid://b187gcfkk5ih4"
+path="res://.godot/imported/hand_point.png-408716f44539bd22aa7c335b193c3a99.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/icons/musicOff.png"
-dest_files=["res://.godot/imported/musicOff.png-95bd8dae31b0b1f5b6b9621edb66cc49.ctex"]
+source_file="res://ui/pointers/2_double/hand_point.png"
+dest_files=["res://.godot/imported/hand_point.png-408716f44539bd22aa7c335b193c3a99.ctex"]
 
 [params]
 

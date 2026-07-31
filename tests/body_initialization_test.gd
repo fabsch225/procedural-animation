@@ -20,6 +20,8 @@ func _run() -> void:
 		_fail("main scene did not initialize all switchable bodies")
 		_finish(main_scene)
 		return
+	_assert_body_menu(main_scene.get_node("UI/BodyName") as MenuButton, switcher)
+	await _assert_control_debug_overlay(main_scene)
 
 	paused = true
 	for body_index in range(1, switcher.bodies.size()):
@@ -40,6 +42,38 @@ func _run() -> void:
 		_assert_initialized_lizard_arms(lizard)
 
 	_finish(main_scene)
+
+
+func _assert_control_debug_overlay(main_scene: Node) -> void:
+	var toggle := main_scene.get_node(
+		"Pause/DebugPanel/Margin/Options/UIBounds"
+	) as CheckButton
+	var overlay := main_scene.get_node(
+		"DebugOverlay/ControlBounds"
+	) as ControlDebugOverlay
+	if toggle == null or overlay == null:
+		_fail("control debug overlay UI was not initialized")
+		return
+	toggle.toggled.emit(true)
+	await process_frame
+	if not overlay.debug_enabled or not overlay.visible:
+		_fail("Show UI bounds did not enable the debug overlay")
+	toggle.toggled.emit(false)
+	if overlay.debug_enabled or overlay.visible:
+		_fail("Show UI bounds did not disable the debug overlay")
+
+
+func _assert_body_menu(menu: MenuButton, switcher: BodySwitcher) -> void:
+	if menu == null or menu.get_popup().item_count != switcher.bodies.size():
+		_fail("body menu did not list every switchable body")
+		return
+	menu.get_popup().id_pressed.emit(2)
+	if switcher.active_body_index != 2 or menu.text != "fish":
+		_fail("selecting a body menu item did not activate and label the body")
+		return
+	var selected_item := menu.get_popup().get_item_index(2)
+	if selected_item < 0 or not menu.get_popup().is_item_checked(selected_item):
+		_fail("body menu did not mark the active body")
 
 
 func _assert_consistent_chain(test_name: String, chain: Chain) -> void:

@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/pointer.gd" id="1_pointer"]
+[ext_resource type="Texture2D" uid="uid://b187gcfkk5ih4" path="res://ui/pointers/2_double/hand_point.png" id="2_hand_point"]
 
 [node name="Pointer" type="Control"]
 layout_mode = 3
@@ -13,6 +14,8 @@ mouse_filter = 2
 script = ExtResource("1_pointer")
 cursor_folder = "res://ui/pointers"
 scan_subfolders = true
+pointing_hand_override = ExtResource("2_hand_point")
+pointing_hand_hotspot = Vector2(16, 8)
 
 [node name="FileNameLabel" type="Label" parent="."]
 layout_mode = 0

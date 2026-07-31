@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d810c0h1q0x6"
-path="res://.godot/imported/button3.png-2e62de9a7e03668e080baa44bb55af3e.ctex"
+uid="uid://c3ncl8gdsnbqf"
+path="res://.godot/imported/exclamation.png-e52339d940ece22710317e66efc7bd09.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://ui/icons/button3.png"
-dest_files=["res://.godot/imported/button3.png-2e62de9a7e03668e080baa44bb55af3e.ctex"]
+source_file="res://ui/icons/2x/exclamation.png"
+dest_files=["res://.godot/imported/exclamation.png-e52339d940ece22710317e66efc7bd09.ctex"]
 
 [params]
 
