@@ -46,9 +46,9 @@ var triangles: PackedVector2Array = tessellator.tessellate(path, 0.001)
 ```
 
 The Snake uses this automatically when `Body Render Mode` is set to
-`Processing Vector Fill`, and Fish uses it for its body and curved fins. If
-the native class is unavailable, Godot reports an error and skips those fills
-instead of silently selecting another tessellator.
+`Processing Vector Fill`; Fish and Lizard use it for their curved bodies and
+fins. If the native class is unavailable, Godot reports an error and skips
+those fills instead of silently selecting another tessellator.
 
 ## Test
 

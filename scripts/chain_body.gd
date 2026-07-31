@@ -51,6 +51,7 @@ func _ready() -> void:
 			* get_viewport_rect().get_center()
 		)
 	spine = Chain.new(origin, joint_count, link_size, angle_constraint)
+	_on_spine_created()
 	queue_redraw()
 
 
@@ -74,6 +75,7 @@ func _process(delta: float) -> void:
 	if not offset.is_zero_approx():
 		var distance := minf(movement_speed * delta, offset.length())
 		spine.resolve(head + offset.normalized() * distance)
+	_after_spine_resolved(delta)
 	queue_redraw()
 
 
@@ -83,6 +85,19 @@ func _draw() -> void:
 	_draw_chain_body()
 	if debug_chain:
 		spine.draw(self)
+		_draw_additional_debug_chains()
+
+
+func _on_spine_created() -> void:
+	pass
+
+
+func _after_spine_resolved(_delta: float) -> void:
+	pass
+
+
+func _draw_additional_debug_chains() -> void:
+	pass
 
 
 func _body_position(

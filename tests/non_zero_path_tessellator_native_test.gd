@@ -44,6 +44,16 @@ func _init() -> void:
 		]),
 		0.0
 	)
+	_test_triangle_sanity(
+		"near-coincident crossings",
+		PackedVector2Array([
+			Vector2(0.0, 0.0),
+			Vector2(1000.0, 1.0),
+			Vector2(0.0, 1.0),
+			Vector2(1000.0, 0.0005),
+		])
+	)
+	_test_invalid_coordinates()
 
 	if failures == 0:
 		print("NonZeroPathTessellatorNative tests passed")
@@ -71,6 +81,35 @@ func _native_tessellate(contour: PackedVector2Array) -> PackedVector2Array:
 	if result is PackedVector2Array:
 		return result as PackedVector2Array
 	return PackedVector2Array()
+
+
+func _test_triangle_sanity(test_name: String, contour: PackedVector2Array) -> void:
+	var triangles := _native_tessellate(contour)
+	if triangles.size() % 3 != 0:
+		failures += 1
+		push_error("%s returned incomplete triangles" % test_name)
+		return
+
+	var bounds := Rect2(contour[0], Vector2.ZERO)
+	for point in contour:
+		bounds = bounds.expand(point)
+	bounds = bounds.grow(TOLERANCE)
+	for point in triangles:
+		if not point.is_finite() or not bounds.has_point(point):
+			failures += 1
+			push_error("%s returned an invalid or out-of-bounds vertex: %s" % [test_name, point])
+			return
+
+
+func _test_invalid_coordinates() -> void:
+	var triangles := _native_tessellate(PackedVector2Array([
+		Vector2(NAN, 0.0),
+		Vector2(10.0, 0.0),
+		Vector2(0.0, 10.0),
+	]))
+	if not triangles.is_empty():
+		failures += 1
+		push_error("invalid coordinates should return no triangles")
 
 
 func _triangle_area(triangles: PackedVector2Array) -> float:
