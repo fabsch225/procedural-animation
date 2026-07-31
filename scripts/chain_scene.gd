@@ -2,6 +2,9 @@ class_name ChainScene
 extends Node2D
 
 
+@export_group("Body")
+@export var body_name: String = "chain"
+
 @export_group("Chain")
 @export_range(2, 128, 1) var chain_segments: int = 8
 @export_range(1.0, 200.0, 1.0) var link_size: float = 80.0
@@ -39,6 +42,24 @@ func _ready() -> void:
 	chain = Chain.new(lock_anchor, chain_segments, link_size, angle_constraint)
 	_update_camera()
 	queue_redraw()
+
+
+func activate() -> void:
+	visible = true
+	process_mode = Node.PROCESS_MODE_PAUSABLE
+	if is_instance_valid(chain_camera):
+		_update_camera()
+
+
+func deactivate() -> void:
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+	if is_instance_valid(chain_camera):
+		chain_camera.enabled = false
+
+
+func is_active() -> bool:
+	return process_mode != Node.PROCESS_MODE_DISABLED
 
 
 func _process(_delta: float) -> void:
