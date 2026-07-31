@@ -4,3 +4,7 @@
 
 [node name="Fish" type="Node2D"]
 script = ExtResource("1_fish")
+body_name = "fish"
+joint_count = 12
+movement_speed = 960.0
+body_color = Color(0.227451, 0.486275, 0.647059, 1)

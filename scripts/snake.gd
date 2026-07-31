@@ -1,5 +1,5 @@
 class_name Snake
-extends Node2D
+extends ChainBody
 
 
 enum OutlineMode {
@@ -12,78 +12,16 @@ enum BodyRenderMode {
 	PROCESSING_VECTOR_FILL,
 }
 
-@export_group("Body")
-@export var body_name: String = "snake"
-
-@export_group("Movement")
-@export_range(2, 128, 1) var joint_count: int = 48
-@export_range(1.0, 200.0, 1.0) var link_size: float = 64.0
-@export_range(0.0, TAU, 0.01, "radians") var angle_constraint: float = PI / 8.0
-@export_range(1.0, 2000.0, 1.0) var movement_speed: float = 480.0
-@export var start_at_viewport_center: bool = true
-
-@export_group("Appearance")
-@export var body_color: Color = Color8(172, 57, 49)
-@export var outline_color: Color = Color.WHITE
+@export_group("Snake Appearance")
 @export var body_render_mode: BodyRenderMode = BodyRenderMode.GODOT_RIBBON
 @export var outline_mode: OutlineMode = OutlineMode.SILHOUETTE
-@export_range(0.0, 32.0, 0.5) var outline_width: float = 4.0
 @export_range(1, 20, 1) var curve_subdivisions: int = 12
-@export_range(1, 64, 1) var processing_curve_resolution: int = 16
-@export var processing_adaptive_curves: bool = true
-@export_range(0.01, 2.0, 0.01) var processing_curve_tolerance: float = 0.35
-@export_range(1.0, 64.0, 1.0) var eye_radius: float = 12.0
-@export var debug_chain: bool = false
-
-var spine: Chain
-var _native_tessellator: Object
-var _native_tessellator_checked: bool = false
-var _native_error_reported: bool = false
 
 
-func _ready() -> void:
-	process_mode = Node.PROCESS_MODE_PAUSABLE
-	var origin := Vector2.ZERO
-	if start_at_viewport_center:
-		origin = to_local(get_viewport().get_canvas_transform().affine_inverse() * get_viewport_rect().get_center())
-	spine = Chain.new(origin, joint_count, link_size, angle_constraint)
-	queue_redraw()
-
-
-func activate() -> void:
-	visible = true
-	process_mode = Node.PROCESS_MODE_PAUSABLE
-
-
-func deactivate() -> void:
-	visible = false
-	process_mode = Node.PROCESS_MODE_DISABLED
-
-
-func is_active() -> bool:
-	return process_mode != Node.PROCESS_MODE_DISABLED
-
-
-func _process(delta: float) -> void:
-	var head := spine.joints[0]
-	var offset := get_local_mouse_position() - head
-
-	if not offset.is_zero_approx():
-		var distance := minf(movement_speed * delta, offset.length())
-		spine.resolve(head + offset.normalized() * distance)
-
-	queue_redraw()
-
-
-func _draw() -> void:
-	if spine == null or spine.joints.size() < 2:
-		return
-
+func _draw_chain_body() -> void:
 	if body_render_mode == BodyRenderMode.PROCESSING_VECTOR_FILL:
 		_draw_processing_vector_body()
-		_draw_eyes()
-		if debug_chain:
-			spine.draw(self)
+		_draw_standard_eyes()
 		return
 
 	var samples := _build_body_samples()
@@ -96,100 +34,45 @@ func _draw() -> void:
 		_draw_body(samples, 0.0, body_color)
 		_draw_overlapping_outline(samples)
 
-	_draw_eyes()
-	if debug_chain:
-		spine.draw(self)
+	_draw_standard_eyes()
 
 
 func _draw_processing_vector_body() -> void:
 	var path := _build_processing_outline()
-	var triangles := _tessellate_processing_path(path)
-
-	if not triangles.is_empty():
-		var indices := PackedInt32Array()
-		indices.resize(triangles.size())
-		for i in range(indices.size()):
-			indices[i] = i
-
-		var colors := PackedColorArray()
-		colors.resize(triangles.size())
-		colors.fill(body_color)
-		RenderingServer.canvas_item_add_triangle_array(
-			get_canvas_item(), indices, triangles, colors
-		)
-
-	if path.size() >= 2 and outline_width > 0.0:
-		draw_polyline(path, outline_color, outline_width, true)
-
-
-func _tessellate_processing_path(path: PackedVector2Array) -> PackedVector2Array:
-	var native := _get_native_tessellator()
-	if native != null:
-		var result: Variant = native.call(&"tessellate", path)
-		if result is PackedVector2Array:
-			return result as PackedVector2Array
-
-	if not _native_error_reported:
-		push_error(
-			"Native snake tessellator is unavailable. Build "
-			+ "native/non_zero_tessellator before using Processing Vector Fill."
-		)
-		_native_error_reported = true
-	return PackedVector2Array()
-
-
-func _get_native_tessellator() -> Object:
-	if is_instance_valid(_native_tessellator):
-		return _native_tessellator
-	if _native_tessellator_checked:
-		return null
-
-	_native_tessellator_checked = true
-	if ClassDB.class_exists(&"NonZeroPathTessellatorNative"):
-		_native_tessellator = ClassDB.instantiate(&"NonZeroPathTessellatorNative")
-	return _native_tessellator
+	_draw_filled_path(path, body_color)
 
 
 func get_active_tessellator_backend() -> StringName:
 	match body_render_mode:
 		BodyRenderMode.PROCESSING_VECTOR_FILL:
-			return &"gdextension" if _get_native_tessellator() != null else &"unavailable"
+			return get_tessellator_backend()
 		_:
 			return &"not_applicable"
 
 
 func _build_processing_outline() -> PackedVector2Array:
-	var shape := ProcessingShape2D.new()
-	shape.curve_resolution = processing_curve_resolution
-	shape.adaptive_curve_flattening = processing_adaptive_curves
-	shape.curve_tolerance = processing_curve_tolerance
+	var shape := _new_processing_shape()
 	shape.begin_shape()
 
 	for i in range(spine.joints.size()):
-		shape.curve_vertex(_processing_body_position(i, PI / 2.0))
+		shape.curve_vertex(_body_position(i, PI / 2.0))
 
 	var tail_index := spine.joints.size() - 1
-	shape.curve_vertex(_processing_body_position(tail_index, PI))
+	shape.curve_vertex(_body_position(tail_index, PI))
 
 	for i in range(tail_index, -1, -1):
-		shape.curve_vertex(_processing_body_position(i, -PI / 2.0))
+		shape.curve_vertex(_body_position(i, -PI / 2.0))
 
-	shape.curve_vertex(_processing_body_position(0, -PI / 6.0))
-	shape.curve_vertex(_processing_body_position(0, 0.0))
-	shape.curve_vertex(_processing_body_position(0, PI / 6.0))
+	shape.curve_vertex(_body_position(0, -PI / 6.0))
+	shape.curve_vertex(_body_position(0, 0.0))
+	shape.curve_vertex(_body_position(0, PI / 6.0))
 
 	# Processing curveVertex needs repeated leading vertices to render the
 	# final segments of a closed curve, matching the original Snake.pde.
 	for i in range(mini(3, spine.joints.size())):
-		shape.curve_vertex(_processing_body_position(i, PI / 2.0))
+		shape.curve_vertex(_body_position(i, PI / 2.0))
 
 	return shape.end_shape(true)
-
-
-func _processing_body_position(index: int, angle_offset: float) -> Vector2:
-	return spine.joints[index] + Vector2.from_angle(
-		spine.angles[index] + angle_offset
-	) * _body_radius(index)
 
 
 func _draw_body(samples: Array[BodySample], inset: float, color: Color) -> void:
@@ -357,13 +240,8 @@ func _build_body_samples() -> Array[BodySample]:
 	return samples
 
 
-func _draw_eyes() -> void:
-	var head_angle := spine.angles[0]
-	var eye_distance := maxf(0.0, _body_radius(0) - 18.0)
-	var left_eye := spine.joints[0] + Vector2.from_angle(head_angle + PI / 2.0) * eye_distance
-	var right_eye := spine.joints[0] + Vector2.from_angle(head_angle - PI / 2.0) * eye_distance
-	draw_circle(left_eye, eye_radius, Color.WHITE)
-	draw_circle(right_eye, eye_radius, Color.WHITE)
+func _minimum_joint_count() -> int:
+	return 2
 
 
 func _body_radius(index: int) -> float:

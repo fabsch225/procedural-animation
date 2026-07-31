@@ -5,6 +5,12 @@ extends Node2D
 @export var starting_body_index: int = 0
 @export var body_name_label_path: NodePath = ^"../../UI/BodyName"
 
+@export_group("Debug")
+@export var debug_chain: bool = false:
+	set(value):
+		debug_chain = value
+		_apply_debug_chain_override()
+
 var active_body_index: int = -1
 var bodies: Array[Node] = []
 @onready var body_name_label := get_node_or_null(body_name_label_path) as Label
@@ -13,6 +19,7 @@ var bodies: Array[Node] = []
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_refresh_bodies()
+	_apply_debug_chain_override()
 	if not bodies.is_empty():
 		activate_body(starting_body_index)
 
@@ -65,3 +72,10 @@ func _refresh_bodies() -> void:
 	for child in get_children():
 		if child.has_method(&"activate") and child.has_method(&"deactivate"):
 			bodies.append(child)
+
+
+func _apply_debug_chain_override() -> void:
+	for body in bodies:
+		if body is ChainBody:
+			(body as ChainBody).debug_chain = debug_chain
+			(body as ChainBody).queue_redraw()
