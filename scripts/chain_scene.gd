@@ -9,6 +9,11 @@ extends Node2D
 @export_range(1.0, 100.0, 1.0) var line_thickness: float = 14.0
 @export_range(0.0, TAU, 0.01, "radians") var angle_constraint: float = TAU
 
+@export_group("Camera")
+@export var camera_enabled: bool = false
+@export var camera_position_smoothing_enabled: bool = true
+@export_range(0.1, 20.0, 0.1) var camera_position_smoothing_speed: float = 5.0
+
 @export_group("Lock")
 @export var locked: bool = false
 @export var use_viewport_center_as_lock_anchor: bool = true
@@ -21,10 +26,7 @@ extends Node2D
 @export_group("Hard Boundaries")
 @export var hard_boundaries_enabled: bool = true
 
-@export_group("Camera")
-@export var camera_enabled: bool = false
-@export var camera_position_smoothing_enabled: bool = true
-@export_range(0.1, 20.0, 0.1) var camera_position_smoothing_speed: float = 5.0
+
 
 var chain: Chain
 @onready var chain_camera: Camera2D = $Camera2D

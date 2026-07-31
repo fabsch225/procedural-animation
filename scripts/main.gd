@@ -1,4 +1,4 @@
-extends Control
+extends Node
 
 
 @export var hide_mouse_cursor: bool = false
