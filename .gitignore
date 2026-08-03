@@ -10,3 +10,4 @@
 /native/non_zero_tessellator/bin/~*.dll
 /native/non_zero_tessellator/bin/~*.TMP
 /native/non_zero_tessellator/src/*.o
+*.tmp
