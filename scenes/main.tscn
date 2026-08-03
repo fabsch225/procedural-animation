@@ -14,6 +14,7 @@
 [ext_resource type="Texture2D" uid="uid://bytluw8ilt0fr" path="res://ui/icons/2x/pause.png" id="12_eb6dy"]
 [ext_resource type="Texture2D" uid="uid://7awadmo5x2b6" path="res://ui/icons/2x/larger.png" id="12_larger"]
 [ext_resource type="Script" uid="uid://bqnowoh1ho7bd" path="res://scripts/control_debug_overlay.gd" id="14_control_debug"]
+[ext_resource type="Theme" uid="uid://db273b8j53fqi" path="res://ui/theme.tres" id="14_jkv2x"]
 
 [sub_resource type="GDScript" id="GDScript_a8y0u"]
 script/source = "extends RichTextLabel
@@ -178,6 +179,7 @@ offset_top = 116.0
 offset_right = -16.0
 offset_bottom = 360.0
 grow_horizontal = 0
+theme = ExtResource("14_jkv2x")
 
 [node name="Margin" type="MarginContainer" parent="Pause/DebugPanel" unique_id=1192816322]
 layout_mode = 2
