@@ -2,17 +2,16 @@
 
 [ext_resource type="Script" uid="uid://damto7vb0aujj" path="res://scripts/main.gd" id="1_0wfyh"]
 [ext_resource type="PackedScene" path="res://scenes/chain.tscn" id="2_sugp2"]
-[ext_resource type="PackedScene" path="res://scenes/pointer.tscn" id="3_pointer"]
-[ext_resource type="Texture2D" uid="uid://cb7aweeon33nh" path="res://ui/pointers/2_double/cursor_none.png" id="4_jyhfs"]
+[ext_resource type="PackedScene" uid="uid://534x4fht3vpo" path="res://scenes/pointer.tscn" id="3_pointer"]
 [ext_resource type="PackedScene" uid="uid://25vkagkvs2u2" path="res://scenes/world_boundary.tscn" id="5_boundary"]
 [ext_resource type="PackedScene" uid="uid://cah1xwm4r5u60" path="res://scenes/godot_icon.tscn" id="5_icon"]
 [ext_resource type="PackedScene" path="res://scenes/snake.tscn" id="8_snake"]
 [ext_resource type="Script" uid="uid://do4xn3vnf4fod" path="res://scripts/body_switcher.gd" id="9_body_switcher"]
 [ext_resource type="PackedScene" path="res://scenes/fish.tscn" id="10_fish"]
-[ext_resource type="Texture2D" uid="uid://5y5fb65n2gxn" path="res://ui/icons/2x/scrollHorizontal.png" id="11_a8y0u"]
+[ext_resource type="Texture2D" uid="uid://xbkf7oo66qnh" path="res://ui/icons/1x/scrollHorizontal.png" id="11_a8y0u"]
 [ext_resource type="PackedScene" path="res://scenes/lizard.tscn" id="11_lizard"]
-[ext_resource type="Texture2D" uid="uid://bytluw8ilt0fr" path="res://ui/icons/2x/pause.png" id="12_eb6dy"]
-[ext_resource type="Texture2D" uid="uid://7awadmo5x2b6" path="res://ui/icons/2x/larger.png" id="12_larger"]
+[ext_resource type="Texture2D" uid="uid://cmq6hpr3xv5m4" path="res://ui/icons/1x/larger.png" id="12_jkv2x"]
+[ext_resource type="Texture2D" uid="uid://xbibabk5tokl" path="res://ui/icons/1x/pause.png" id="13_a8y0u"]
 [ext_resource type="Script" uid="uid://bqnowoh1ho7bd" path="res://scripts/control_debug_overlay.gd" id="14_control_debug"]
 [ext_resource type="Theme" uid="uid://db273b8j53fqi" path="res://ui/theme.tres" id="14_jkv2x"]
 
@@ -50,6 +49,7 @@ color = Color(0.152941, 0.176471, 0.203922, 1)
 
 [node name="bodies" type="Node2D" parent="World" unique_id=902427454]
 script = ExtResource("9_body_switcher")
+body_name_menu_path = NodePath("../../UI/ControlsMargin/ControlsContainer/BodyName")
 
 [node name="Chain" parent="World/bodies" unique_id=87645108 instance=ExtResource("2_sugp2")]
 
@@ -75,30 +75,31 @@ boundary_type = 1
 [node name="UI" type="CanvasLayer" parent="." unique_id=561044742]
 
 [node name="Pointer" parent="UI" unique_id=38199738 instance=ExtResource("3_pointer")]
-hotswap_enabled = false
-override_cursor = ExtResource("4_jyhfs")
-override_hotspot = Vector2(16, 8)
 
-[node name="Controls" type="Control" parent="UI" unique_id=1599957405]
-modulate = Color(1, 1, 1, 0.8)
-layout_mode = 3
+[node name="ControlsMargin" type="MarginContainer" parent="UI" unique_id=1270421746]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="ControlsContainer" type="Control" parent="UI/ControlsMargin" unique_id=1599957405]
+modulate = Color(1, 1, 1, 0.8)
+layout_mode = 2
 mouse_filter = 2
 
-[node name="BodyName" type="MenuButton" parent="UI/Controls" unique_id=2107912263]
+[node name="BodyName" type="MenuButton" parent="UI/ControlsMargin/ControlsContainer" unique_id=2107912263]
 custom_minimum_size = Vector2(150, 48)
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = -64.0
-offset_right = 166.0
-offset_bottom = -16.0
+offset_top = -48.0
+offset_right = 150.0
 grow_vertical = 0
 tooltip_text = "Select body (mouse wheel also cycles)"
 focus_mode = 0
@@ -114,7 +115,7 @@ icon = ExtResource("11_a8y0u")
 alignment = 0
 expand_icon = true
 
-[node name="FullscreenButton" type="TextureButton" parent="UI/Controls" unique_id=26456824]
+[node name="FullscreenButton" type="TextureButton" parent="UI/ControlsMargin/ControlsContainer" unique_id=26456824]
 custom_minimum_size = Vector2(68, 68)
 layout_mode = 1
 anchors_preset = 3
@@ -122,29 +123,27 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -84.0
-offset_top = -84.0
-offset_right = -16.0
-offset_bottom = -16.0
+offset_left = -68.0
+offset_top = -68.0
 grow_horizontal = 0
 grow_vertical = 0
 focus_mode = 0
 mouse_default_cursor_shape = 2
-texture_normal = ExtResource("12_larger")
+texture_normal = ExtResource("12_jkv2x")
 ignore_texture_size = true
 stretch_mode = 5
 
-[node name="PauseButton" type="TextureButton" parent="UI/Controls" unique_id=708549155]
+[node name="PauseButton" type="TextureButton" parent="UI/ControlsMargin/ControlsContainer" unique_id=708549155]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -100.0
-offset_bottom = 100.0
+offset_left = -64.0
+offset_bottom = 64.0
 grow_horizontal = 0
 focus_mode = 0
 mouse_default_cursor_shape = 2
-texture_normal = ExtResource("12_eb6dy")
+texture_normal = ExtResource("13_a8y0u")
 ignore_texture_size = true
 stretch_mode = 5
 
@@ -178,7 +177,7 @@ anchor_right = 1.0
 offset_left = -276.0
 offset_top = 116.0
 offset_right = -16.0
-offset_bottom = 360.0
+offset_bottom = 364.0
 grow_horizontal = 0
 theme = ExtResource("14_jkv2x")
 

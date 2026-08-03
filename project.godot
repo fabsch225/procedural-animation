@@ -32,10 +32,6 @@ mouse_cursor/custom_image="uid://bpkwvayghu3rg"
 
 enabled=PackedStringArray("res://addons/godot_ai/plugin.cfg")
 
-[gui]
-
-timers/tooltip_delay_sec=0.05
-
 [input]
 
 anchor={

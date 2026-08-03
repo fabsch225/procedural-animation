@@ -22,13 +22,14 @@ enum LeftClickBehavior {
 @export var hide_mouse_cursor: bool = false
 
 @onready var pause_layer: CanvasLayer = $Pause
-@onready var pause_button: TextureButton = $UI/Controls/PauseButton
+@onready var controls_container: Control = $UI/ControlsMargin/ControlsContainer
+@onready var pause_button: TextureButton = controls_container.get_node("PauseButton")
 @onready var debug_chain_toggle: CheckButton = $Pause/DebugPanel/Margin/Options/DebugChain
 @onready var ui_bounds_toggle: CheckButton = $Pause/DebugPanel/Margin/Options/UIBounds
 @onready var right_click_behavior: OptionButton = $Pause/DebugPanel/Margin/Options/RightClickRow/Behavior
 @onready var left_click_behavior: OptionButton = $Pause/DebugPanel/Margin/Options/LeftClickRow/Behavior
 @onready var body_switcher: BodySwitcher = $World/bodies
-@onready var fullscreen_button: TextureButton = $UI/Controls/FullscreenButton
+@onready var fullscreen_button: TextureButton = controls_container.get_node("FullscreenButton")
 @onready var control_debug_overlay: ControlDebugOverlay = $DebugOverlay/ControlBounds
 
 var _windowed_mode_before_fullscreen: int = DisplayServer.WINDOW_MODE_WINDOWED

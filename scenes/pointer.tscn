@@ -1,9 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://534x4fht3vpo"]
 
-[ext_resource type="Script" path="res://scripts/pointer.gd" id="1_pointer"]
-[ext_resource type="Texture2D" uid="uid://b187gcfkk5ih4" path="res://ui/pointers/2_double/hand_point.png" id="2_hand_point"]
+[ext_resource type="Script" uid="uid://ccmgo82a10aif" path="res://scripts/pointer.gd" id="1_pointer"]
+[ext_resource type="Texture2D" uid="uid://v171sa7xa23j" path="res://ui/pointers/1_single/outline/cursor_none.png" id="2_vyy14"]
+[ext_resource type="Texture2D" uid="uid://lma58n7fdjt6" path="res://ui/pointers/1_single/outline/hand_point.png" id="3_hwapi"]
 
-[node name="Pointer" type="Control"]
+[node name="Pointer" type="Control" unique_id=58665572]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,12 +13,14 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_pointer")
+hotswap_enabled = false
+override_cursor = ExtResource("2_vyy14")
+override_hotspot = Vector2(8, 4)
+pointing_hand_override = ExtResource("3_hwapi")
+pointing_hand_hotspot = Vector2(8, 4)
 cursor_folder = "res://ui/pointers"
-scan_subfolders = true
-pointing_hand_override = ExtResource("2_hand_point")
-pointing_hand_hotspot = Vector2(16, 8)
 
-[node name="FileNameLabel" type="Label" parent="."]
+[node name="FileNameLabel" type="Label" parent="." unique_id=1911267941]
 layout_mode = 0
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -26,7 +29,6 @@ offset_top = -48.0
 offset_right = 500.0
 offset_bottom = -16.0
 grow_vertical = 0
-mouse_filter = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.75)
 theme_override_constants/shadow_offset_x = 2
