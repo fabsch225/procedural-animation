@@ -18,9 +18,20 @@
 [sub_resource type="GDScript" id="GDScript_a8y0u"]
 script/source = "extends RichTextLabel
 
+const VERSION = \"0.1.1\"
+@onready var version_label: Label = $\"../HBoxContainer/VersionLabel\"
+
+var ABOUT_MSG = \"\\
+[img=24]res://ui/icons/other/github.png[/img] \\
+[url=https://github.com/BaconEggsRL/procedural-animation]GitHub[/url] \\
+| [img=24]res://ui/icons/other/kofi_cup.webp[/img] \\
+[url=https://ko-fi.com/baconeggsrl]KoFi[/url]\"
+
 func _ready() -> void:
 	# Connect the signal via code (or use the Node tab in the editor)
 	meta_clicked.connect(_on_meta_clicked)
+	self.text = ABOUT_MSG
+	version_label.text = VERSION
 
 func _on_meta_clicked(meta: Variant) -> void:
 	var meta_string = str(meta)
@@ -192,10 +203,21 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Pause/DebugPanel/Margin/Options" unique_id=1267674909]
+[node name="HBoxContainer" type="HBoxContainer" parent="Pause/DebugPanel/Margin/Options" unique_id=1851766447]
 layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Pause/DebugPanel/Margin/Options/HBoxContainer" unique_id=1267674909]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Debug Options"
+
+[node name="VersionLabel" type="Label" parent="Pause/DebugPanel/Margin/Options/HBoxContainer" unique_id=1728441919]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_colors/font_color = Color(1, 1, 1, 0.5)
+text = "<VERSION>"
+vertical_alignment = 1
 
 [node name="DebugChain" type="CheckButton" parent="Pause/DebugPanel/Margin/Options" unique_id=1341762760]
 layout_mode = 2

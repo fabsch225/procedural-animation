@@ -1,6 +1,5 @@
 extends Node
 
-
 const ENTER_FULLSCREEN_ICON: Texture2D = preload("res://ui/icons/2x/larger.png")
 
 const EXIT_FULLSCREEN_ICON: Texture2D = preload("res://ui/icons/2x/smaller.png")
