@@ -52,7 +52,7 @@ func _assert_tooltip_delay() -> void:
 
 func _assert_input_actions() -> void:
 	_assert_action_mouse_button(&"anchor", MOUSE_BUTTON_RIGHT)
-	_assert_action_mouse_button(&"cycle_body", MOUSE_BUTTON_LEFT)
+	_assert_action_mouse_button(&"next_body", MOUSE_BUTTON_LEFT)
 	_assert_action_keys(&"pause", [KEY_ESCAPE, KEY_SPACE, KEY_ENTER, KEY_KP_ENTER])
 	_assert_action_keys(&"fullscreen", [KEY_F])
 	_assert_action_keys(&"restart", [KEY_R])
@@ -157,13 +157,13 @@ func _assert_left_click_behavior(main_scene: Node) -> void:
 
 	selector.select(0)
 	selector.item_selected.emit(0)
-	if not _action_has_mouse_button(&"cycle_body", MOUSE_BUTTON_LEFT) \
+	if not _action_has_mouse_button(&"next_body", MOUSE_BUTTON_LEFT) \
 			or _action_has_mouse_button(&"pause", MOUSE_BUTTON_LEFT):
 		_fail("Cycle behavior did not move left click to the cycle action")
 
 	selector.select(1)
 	selector.item_selected.emit(1)
-	if _action_has_mouse_button(&"cycle_body", MOUSE_BUTTON_LEFT) \
+	if _action_has_mouse_button(&"next_body", MOUSE_BUTTON_LEFT) \
 			or not _action_has_mouse_button(&"pause", MOUSE_BUTTON_LEFT):
 		_fail("Pause behavior did not move left click to the pause action")
 	var pause_hotkey: String = main_scene.call(&"_get_action_hotkey_text", &"pause")

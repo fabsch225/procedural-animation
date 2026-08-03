@@ -128,12 +128,12 @@ func _set_left_click_behavior(index: int) -> void:
 		index, LeftClickBehavior.CYCLE, LeftClickBehavior.PAUSE
 	) as LeftClickBehavior
 	left_click_behavior.select(behavior)
-	_remove_mouse_button_from_action(&"cycle_body", MOUSE_BUTTON_LEFT)
+	_remove_mouse_button_from_action(&"next_body", MOUSE_BUTTON_LEFT)
 	_remove_mouse_button_from_action(&"pause", MOUSE_BUTTON_LEFT)
 
 	var left_click := InputEventMouseButton.new()
 	left_click.button_index = MOUSE_BUTTON_LEFT
-	var action := &"pause" if behavior == LeftClickBehavior.PAUSE else &"cycle_body"
+	var action := &"pause" if behavior == LeftClickBehavior.PAUSE else &"next_body"
 	InputMap.action_add_event(action, left_click)
 	_update_pause_button()
 

@@ -26,16 +26,9 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"cycle_body"):
+	if event.is_action_pressed(&"next_body"):
 		cycle_body(1)
-		get_viewport().set_input_as_handled()
-		return
-
-	if not event is InputEventMouseButton or not event.pressed:
-		return
-	if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-		cycle_body(1)
-	elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
+	elif event.is_action_pressed(&"prev_body"):
 		cycle_body(-1)
 	else:
 		return
