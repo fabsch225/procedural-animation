@@ -16,11 +16,16 @@ func _run() -> void:
 	await process_frame
 
 	var switcher := main_scene.get_node("World/bodies") as BodySwitcher
-	if switcher == null or switcher.bodies.size() < 4:
+	if switcher == null or switcher.bodies.size() < 5:
 		_fail("main scene did not initialize all switchable bodies")
 		_finish(main_scene)
 		return
-	_assert_body_menu(main_scene.get_node("UI/Controls/BodyName") as MenuButton, switcher)
+	_assert_body_menu(
+		main_scene.get_node(
+			"UI/ControlsMargin/ControlsContainer/BodyName"
+		) as MenuButton,
+		switcher
+	)
 	await _assert_control_debug_overlay(main_scene)
 	_assert_chain_scene_anchor(switcher.bodies[0] as ChainScene)
 
@@ -42,6 +47,12 @@ func _run() -> void:
 	var lizard := switcher.bodies[3] as Lizard
 	if lizard != null:
 		_assert_initialized_lizard_arms(lizard)
+
+	var flower := switcher.bodies[4] as Flower
+	if flower == null:
+		_fail("flower was not registered as the fifth switchable body")
+	else:
+		_assert_initialized_flower(flower)
 
 	_finish(main_scene)
 
@@ -67,14 +78,20 @@ func _assert_chain_scene_anchor(body: ChainScene) -> void:
 
 
 func _assert_chain_body_anchor(body: ChainBody) -> void:
+	var started_anchored := body.anchored
 	var expected_anchor := body.spine.joints.back()
 	body.call(&"_unhandled_input", _anchor_action_event())
-	if not body.anchored \
-			or body.anchor_position.distance_to(expected_anchor) > POSITION_EPSILON:
-		_fail("%s did not anchor its tail through the anchor action" % body.body_name)
+	if body.anchored == started_anchored:
+		_fail("%s did not toggle its anchor through the anchor action" % body.body_name)
+	if body.anchored \
+			and body.anchor_position.distance_to(expected_anchor) > POSITION_EPSILON:
+		_fail("%s did not anchor its tail at the expected position" % body.body_name)
 	body.call(&"_unhandled_input", _anchor_action_event())
-	if body.anchored:
-		_fail("%s did not release its anchor" % body.body_name)
+	if body.anchored != started_anchored:
+		_fail("%s did not restore its initial anchor state" % body.body_name)
+	if body.anchored \
+			and body.anchor_position.distance_to(expected_anchor) > POSITION_EPSILON:
+		_fail("%s did not anchor its tail at the expected position" % body.body_name)
 
 
 func _assert_control_debug_overlay(main_scene: Node) -> void:
@@ -159,6 +176,25 @@ func _assert_initialized_lizard_arms(lizard: Lizard) -> void:
 			if absf(distance - arm.link_size) > POSITION_EPSILON:
 				_fail("lizard arm %d started with a compressed link" % i)
 				return
+
+
+func _assert_initialized_flower(flower: Flower) -> void:
+	if not flower.anchored:
+		_fail("flower was not chained by default")
+	if flower.LEAF_JOINT_INDICES.size() < 2:
+		_fail("flower did not define at least two leaves")
+		return
+	for leaf_index in range(flower.LEAF_JOINT_INDICES.size()):
+		var outline: PackedVector2Array = flower.call(
+			&"_build_leaf_outline",
+			flower.LEAF_JOINT_INDICES[leaf_index],
+			1.0 if leaf_index % 2 == 0 else -1.0
+		)
+		if outline.size() < 3:
+			_fail("flower leaf %d did not create a visible outline" % leaf_index)
+	var petal: PackedVector2Array = flower.call(&"_build_petal_outline", 0)
+	if flower.petal_count < 5 or petal.size() < 3:
+		_fail("flower did not create a complete blossom")
 
 
 func _finish(main_scene: Node) -> void:

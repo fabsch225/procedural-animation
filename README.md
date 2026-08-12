@@ -1,8 +1,8 @@
 # Procedural Animation
 
-Procedural, chain-driven animal animation in Godot 4.7. The project includes
-an interactive chain, snake, fish, and lizard that follow the pointer using
-distance, angle, and FABRIK constraints.
+Procedural, chain-driven character animation in Godot 4.7. The project
+includes an interactive chain, snake, fish, lizard, and anchored flower that
+follow the pointer using distance, angle, and FABRIK constraints.
 
 This is a Godot adaptation and extension of Argonaut's Processing 4
 procedural-animation project. See [Credits](#credits) for the original source
@@ -10,7 +10,7 @@ and accompanying tutorial.
 
 ## Highlights
 
-- Shared `ChainBody` foundation for the snake, fish, and lizard.
+- Shared `ChainBody` foundation for the snake, fish, lizard, and flower.
 - Runtime body switching, tail anchoring, pausing, and fullscreen controls.
 - Configurable soft and hard chain boundaries with sliding and squishiness.
 - Native non-zero winding tessellation for curved, self-overlapping bodies.
