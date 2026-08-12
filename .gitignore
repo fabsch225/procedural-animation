@@ -9,4 +9,7 @@
 /native/non_zero_tessellator/bin/~*.dll
 /native/non_zero_tessellator/bin/~*.TMP
 /native/non_zero_tessellator/src/*.o
+/native/non_zero_tessellator/src/*.obj
+/native/non_zero_tessellator/src/*.obj.import
+/native/non_zero_tessellator/bin/*.pdb
 *.tmp
