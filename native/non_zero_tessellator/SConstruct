@@ -2,6 +2,7 @@
 
 env = SConscript("godot-cpp/SConstruct")
 env.Append(CPPPATH=["src/"])
+env["SHLIBPREFIX"] = ""
 
 sources = Glob("src/*.cpp")
 library = env.SharedLibrary(

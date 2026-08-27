@@ -70,6 +70,30 @@ func _update_body_name() -> void:
 		)
 
 
+# Bodies whose display name can change at runtime (the randomized creature)
+# call this so the menu and the header label stay in sync.
+func refresh_body_names() -> void:
+	if body_name_menu == null:
+		return
+	var popup := body_name_menu.get_popup()
+	for item_index in range(popup.item_count):
+		var body_index := popup.get_item_id(item_index)
+		if body_index >= 0 and body_index < bodies.size():
+			popup.set_item_text(item_index, str(bodies[body_index].get("body_name")))
+	_update_body_name()
+
+
+func find_body_index(body: Node) -> int:
+	return bodies.find(body)
+
+
+func get_creature() -> Creature:
+	for body in bodies:
+		if body is Creature:
+			return body as Creature
+	return null
+
+
 func _setup_body_menu() -> void:
 	if body_name_menu == null:
 		return

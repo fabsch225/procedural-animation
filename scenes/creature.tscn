@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/creature.gd" id="1_creature"]
+
+[node name="Creature" type="Node2D"]
+script = ExtResource("1_creature")
+body_name = "creature"
+creature_level = 5
+randomize_on_ready = true

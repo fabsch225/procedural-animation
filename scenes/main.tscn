@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://xbkf7oo66qnh" path="res://ui/icons/1x/scrollHorizontal.png" id="11_a8y0u"]
 [ext_resource type="PackedScene" path="res://scenes/lizard.tscn" id="11_lizard"]
 [ext_resource type="PackedScene" path="res://scenes/flower.tscn" id="12_flower"]
+[ext_resource type="PackedScene" path="res://scenes/creature.tscn" id="16_creature"]
 [ext_resource type="Texture2D" uid="uid://cmq6hpr3xv5m4" path="res://ui/icons/1x/larger.png" id="12_jkv2x"]
 [ext_resource type="Texture2D" uid="uid://xbibabk5tokl" path="res://ui/icons/1x/pause.png" id="13_a8y0u"]
 [ext_resource type="Script" uid="uid://bqnowoh1ho7bd" path="res://scripts/control_debug_overlay.gd" id="14_control_debug"]
@@ -76,6 +77,8 @@ debug_chain = true
 [node name="Lizard" parent="World/bodies" unique_id=1721029119 instance=ExtResource("11_lizard")]
 
 [node name="Flower" parent="World/bodies" unique_id=131188350 instance=ExtResource("12_flower")]
+
+[node name="Creature" parent="World/bodies" instance=ExtResource("16_creature")]
 
 [node name="collision" type="Node2D" parent="World" unique_id=1474292432]
 visible = false
@@ -278,6 +281,52 @@ popup/item_0/text = "Cycle"
 popup/item_0/id = 0
 popup/item_1/text = "Pause"
 popup/item_1/id = 1
+
+[node name="CreatureRow" type="HBoxContainer" parent="Pause/DebugPanel/Margin/Options"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="Pause/DebugPanel/Margin/Options/CreatureRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Creature level"
+
+[node name="Level" type="HSlider" parent="Pause/DebugPanel/Margin/Options/CreatureRow"]
+custom_minimum_size = Vector2(140, 28)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Higher levels grow larger, fancier creatures (keys 1-9 and 0)"
+mouse_default_cursor_shape = 2
+min_value = 1.0
+max_value = 10.0
+value = 5.0
+rounded = true
+
+[node name="Value" type="Label" parent="Pause/DebugPanel/Margin/Options/CreatureRow"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+text = "5"
+horizontal_alignment = 2
+
+[node name="RandomizeButton" type="Button" parent="Pause/DebugPanel/Margin/Options"]
+layout_mode = 2
+tooltip_text = "Roll a brand new creature at the current level"
+mouse_default_cursor_shape = 2
+text = "Randomize creature"
+
+[node name="ZooButton" type="Button" parent="Pause/DebugPanel/Margin/Options"]
+layout_mode = 2
+tooltip_text = "Open the zoo demo: buy eggs, buy pens and fuse creatures"
+mouse_default_cursor_shape = 2
+text = "Open zoo demo"
+
+[node name="CreatureSummary" type="Label" parent="Pause/DebugPanel/Margin/Options"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.6)
+theme_override_font_sizes/font_size = 13
+text = "<creature>"
+autowrap_mode = 3
 
 [node name="AboutLabel" type="RichTextLabel" parent="Pause/DebugPanel/Margin/Options" unique_id=750135522]
 custom_minimum_size = Vector2(0, 24)

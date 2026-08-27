@@ -30,6 +30,11 @@ enum LeftClickBehavior {
 @onready var body_switcher: BodySwitcher = $World/bodies
 @onready var fullscreen_button: TextureButton = controls_container.get_node("FullscreenButton")
 @onready var control_debug_overlay: ControlDebugOverlay = $DebugOverlay/ControlBounds
+@onready var creature_level_slider: HSlider = $Pause/DebugPanel/Margin/Options/CreatureRow/Level
+@onready var creature_level_value: Label = $Pause/DebugPanel/Margin/Options/CreatureRow/Value
+@onready var randomize_creature_button: Button = $Pause/DebugPanel/Margin/Options/RandomizeButton
+@onready var creature_summary_label: Label = $Pause/DebugPanel/Margin/Options/CreatureSummary
+@onready var zoo_button: Button = $Pause/DebugPanel/Margin/Options/ZooButton
 
 var _windowed_mode_before_fullscreen: int = DisplayServer.WINDOW_MODE_WINDOWED
 
@@ -45,6 +50,7 @@ func _ready() -> void:
 	_set_right_click_behavior(right_click_behavior.selected)
 	left_click_behavior.item_selected.connect(_on_left_click_behavior_selected)
 	_set_left_click_behavior(left_click_behavior.selected)
+	_setup_creature_controls()
 	pause_button.pressed.connect(_on_pause_button_pressed)
 	fullscreen_button.pressed.connect(_on_fullscreen_button_pressed)
 	get_viewport().size_changed.connect(_update_fullscreen_button)
@@ -70,6 +76,12 @@ func _input(event: InputEvent) -> void:
 			consume_input()
 		elif event.is_action_pressed(&"pause") and not event.echo:
 			toggle_pause()
+			consume_input()
+		elif event.is_action_pressed(&"randomize_creature") and not event.echo:
+			randomize_creature()
+			consume_input()
+		elif not event.echo and event.pressed and _level_from_keycode(event.keycode) > 0:
+			set_creature_level(_level_from_keycode(event.keycode))
 			consume_input()
 
 
@@ -236,6 +248,79 @@ func _compact_mouse_button_label(event: InputEventMouseButton) -> String:
 			return "RMB"
 		_:
 			return event.as_text()
+
+
+# --- Creature randomizer ----------------------------------------------------
+
+
+func _setup_creature_controls() -> void:
+	var creature := body_switcher.get_creature()
+	if creature != null:
+		creature_level_slider.set_value_no_signal(float(creature.creature_level))
+		creature.creature_changed.connect(_on_creature_changed)
+		_on_creature_changed(creature.traits)
+	creature_level_slider.value_changed.connect(_on_creature_level_changed)
+	randomize_creature_button.pressed.connect(_on_randomize_creature_pressed)
+	zoo_button.pressed.connect(_on_zoo_button_pressed)
+	randomize_creature_button.tooltip_text = _with_action_hotkey(
+		"Roll a brand new creature at the current level", &"randomize_creature"
+	)
+	creature_level_value.text = str(int(creature_level_slider.value))
+
+
+# Rolls a new creature and makes sure it is the body on screen.
+func randomize_creature() -> void:
+	var creature := body_switcher.get_creature()
+	if creature == null:
+		return
+	var index := body_switcher.find_body_index(creature)
+	if index >= 0 and index != body_switcher.active_body_index:
+		body_switcher.activate_body(index)
+	creature.reroll(int(creature_level_slider.value))
+
+
+func set_creature_level(level: int) -> void:
+	var clamped := clampi(level, 1, 10)
+	creature_level_slider.set_value_no_signal(float(clamped))
+	creature_level_value.text = str(clamped)
+	var creature := body_switcher.get_creature()
+	if creature != null:
+		creature.creature_level = clamped
+	randomize_creature()
+
+
+func _on_creature_level_changed(value: float) -> void:
+	creature_level_value.text = str(int(value))
+	var creature := body_switcher.get_creature()
+	if creature != null:
+		creature.creature_level = int(value)
+
+
+func _on_randomize_creature_pressed() -> void:
+	randomize_creature()
+
+
+func _on_zoo_button_pressed() -> void:
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/zoo.tscn")
+
+
+func _on_creature_changed(new_traits: CreatureTraits) -> void:
+	if new_traits == null:
+		return
+	creature_summary_label.text = "%s\n%s" % [
+		new_traits.display_name, new_traits.summary()
+	]
+	body_switcher.refresh_body_names()
+
+
+# Number row 1-9 picks a level directly, 0 means level 10.
+func _level_from_keycode(keycode: Key) -> int:
+	if keycode == KEY_0:
+		return 10
+	if keycode >= KEY_1 and keycode <= KEY_9:
+		return int(keycode) - int(KEY_0)
+	return 0
 
 
 func _is_fullscreen() -> bool:

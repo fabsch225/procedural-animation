@@ -1,0 +1,149 @@
+[gd_scene format=3 uid="uid://0tl7vroephnh"]
+
+[ext_resource type="Script" uid="uid://cnj16vqm5el6a" path="res://scripts/zoo_game.gd" id="1_zoo"]
+[ext_resource type="Theme" uid="uid://db273b8j53fqi" path="res://ui/theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://epju18rabt33" path="res://scripts/music_player.gd" id="3_music"]
+
+[node name="Zoo" type="Node2D" unique_id=476685142]
+script = ExtResource("1_zoo")
+
+[node name="Background" type="CanvasLayer" parent="." unique_id=833287665]
+layer = -1
+
+[node name="BG" type="ColorRect" parent="Background" unique_id=750063669]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.101961, 0.117647, 0.133333, 1)
+
+[node name="Music" type="Node" parent="." unique_id=572715601]
+script = ExtResource("3_music")
+
+[node name="Enclosures" type="Node2D" parent="." unique_id=2135710960]
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1526057420]
+
+[node name="Root" type="MarginContainer" parent="UI" unique_id=30285698]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_theme")
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 12
+
+[node name="Layout" type="VBoxContainer" parent="UI/Root" unique_id=1366584669]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Top" type="HBoxContainer" parent="UI/Root/Layout" unique_id=1471618373]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="MoneyLabel" type="Label" parent="UI/Root/Layout/Top" unique_id=143208804]
+custom_minimum_size = Vector2(130, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "0 coins"
+vertical_alignment = 1
+
+[node name="IncomeLabel" type="Label" parent="UI/Root/Layout/Top" unique_id=534242698]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.6, 0.87, 0.66, 1)
+theme_override_font_sizes/font_size = 18
+text = "+0.0 / s"
+vertical_alignment = 1
+
+[node name="EggButton" type="Button" parent="UI/Root/Layout/Top" unique_id=1484547752]
+custom_minimum_size = Vector2(150, 38)
+layout_mode = 2
+tooltip_text = "Hatch a level 1 animal into the selected or first free pen"
+mouse_default_cursor_shape = 2
+text = "Buy egg"
+
+[node name="EraseButton" type="Button" parent="UI/Root/Layout/Top" unique_id=1932646544]
+custom_minimum_size = Vector2(130, 38)
+layout_mode = 2
+tooltip_text = "Delete the saved zoo and start over (tap twice to confirm)"
+mouse_default_cursor_shape = 2
+text = "Erase save"
+
+[node name="PenRow" type="HBoxContainer" parent="UI/Root/Layout" unique_id=1413222642]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="PenLabel" type="Label" parent="UI/Root/Layout/PenRow" unique_id=457869034]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.55)
+theme_override_font_sizes/font_size = 15
+text = "New pen:"
+vertical_alignment = 1
+
+[node name="BasicButton" type="Button" parent="UI/Root/Layout/PenRow" unique_id=140523827]
+custom_minimum_size = Vector2(150, 34)
+layout_mode = 2
+tooltip_text = "Grass, bushes and flowers. Earthy animals with legs."
+mouse_default_cursor_shape = 2
+text = "Meadow"
+
+[node name="WaterButton" type="Button" parent="UI/Root/Layout/PenRow" unique_id=1048697738]
+custom_minimum_size = Vector2(150, 34)
+layout_mode = 2
+tooltip_text = "Kelp, coral and bubbles. Blue animals with fins and no legs."
+mouse_default_cursor_shape = 2
+text = "Reef"
+
+[node name="AlienButton" type="Button" parent="UI/Root/Layout/PenRow" unique_id=1314269699]
+custom_minimum_size = Vector2(150, 34)
+layout_mode = 2
+tooltip_text = "Crystals and drifting orbs. Glowing animals with antennae, and the best breeding odds."
+mouse_default_cursor_shape = 2
+text = "Void"
+
+[node name="Filler" type="Control" parent="UI/Root/Layout/PenRow" unique_id=1986178409]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="ScrollLeft" type="Button" parent="UI/Root/Layout/PenRow" unique_id=1581647456]
+custom_minimum_size = Vector2(46, 34)
+layout_mode = 2
+tooltip_text = "Scroll left (Left arrow / mouse wheel)"
+mouse_default_cursor_shape = 2
+text = "<"
+
+[node name="ScrollRight" type="Button" parent="UI/Root/Layout/PenRow" unique_id=438260736]
+custom_minimum_size = Vector2(46, 34)
+layout_mode = 2
+tooltip_text = "Scroll right (Right arrow / mouse wheel)"
+mouse_default_cursor_shape = 2
+text = ">"
+
+[node name="Spacer" type="Control" parent="UI/Root/Layout" unique_id=1128155928]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="StatusLabel" type="Label" parent="UI/Root/Layout" unique_id=1442298366]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "..."
+autowrap_mode = 3
+
+[node name="HelpLabel" type="Label" parent="UI/Root/Layout" unique_id=1885838963]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.45)
+theme_override_font_sizes/font_size = 13
+text = "..."
+autowrap_mode = 3
