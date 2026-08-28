@@ -5,15 +5,25 @@ adaptive cubic-curve stroke tessellation in C++ through the official
 `godot-cpp` bindings. It supports the self-intersecting Processing-style body
 paths and the lizard's round-capped cubic limbs.
 
-## One-time requirements on macOS
+## One-time requirements
+
+Windows:
+
+- Visual Studio 2022 with **Desktop development with C++**
+
+macOS:
 
 - Xcode Command Line Tools
+
+Both platforms:
+
 - Python 3
 - SCons (`python -m pip install scons`)
 - Git
 
-The build script uses the macOS `arm64` target by default. Pass `-Arch x86_64`
-when building on an Intel Mac.
+The build script uses the macOS `arm64` target by default. Pass
+`-Platform windows -Arch x86_64` to build the Windows library, or
+`-Arch x86_64` when building on an Intel Mac.
 
 ## Build
 
@@ -23,9 +33,8 @@ From PowerShell (`pwsh`) in this directory:
 pwsh -NoProfile -File ./build.ps1
 ```
 
-The first run clones the pinned
-official `godot-cpp` release into this directory. That checkout is ignored by
-Git.
+The first run clones the pinned official `godot-cpp` release into this
+directory. That checkout is ignored by Git.
 
 The first build downloads the pinned `godot-cpp` dependency. Later builds use
 the existing checkout. Build an optimized export library with:
@@ -35,12 +44,9 @@ pwsh -NoProfile -File ./build.ps1 `
 	-Target template_release
 ```
 
-To build the Windows library from PowerShell, pass
-`-Platform windows -Arch x86_64`.
-
-The `.gdextension` resource loads the correct debug or release DLL from
-`bin/`. Godot discovers `.gdextension` resources automatically when the
-project opens; there is no plugin checkbox to enable.
+The `.gdextension` resource loads the correct debug or release library from
+`bin/` for the selected platform. Godot discovers `.gdextension` resources
+automatically when the project opens; there is no plugin checkbox to enable.
 
 ## Build for Web
 
@@ -85,7 +91,10 @@ renderer.
 
 ## Test
 
-Run the native correctness tests from the project root with:
+Run the native correctness tests from the project root with the Godot executable
+for your platform:
+
+Windows:
 
 ```powershell
 & 'C:\Godot\4.7\engine\Godot_v4.7.1-stable_win64.exe\Godot_v4.7.1-stable_win64_console.exe' `
@@ -97,13 +106,25 @@ Run the native correctness tests from the project root with:
 	--script res://tests/cubic_stroke_tessellator_native_test.gd
 ```
 
+macOS:
+
+```powershell
+& '/Applications/Godot.app/Contents/MacOS/Godot' `
+	--headless --path . `
+	--script res://tests/non_zero_path_tessellator_native_test.gd
+
+& '/Applications/Godot.app/Contents/MacOS/Godot' `
+	--headless --path . `
+	--script res://tests/cubic_stroke_tessellator_native_test.gd
+```
+
 ## What Godot needs at runtime
 
 Godot discovers `non_zero_path_tessellator.gdextension` automatically. The
 descriptor names the native class entry point and maps debug/release builds to
-their Windows DLLs and WebAssembly side modules. There is no editor plugin to
-enable and no autoload to add.
+their platform-specific libraries and WebAssembly side modules. There is no
+editor plugin to enable and no autoload to add.
 
 If the C++ source changes, rerun the appropriate build command and restart the
-editor if Windows has the DLL locked. Scene and GDScript changes do not require
-a native rebuild.
+editor if the native library is locked. Scene and GDScript changes do not
+require a native rebuild.
