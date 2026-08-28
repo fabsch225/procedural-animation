@@ -6,6 +6,10 @@ reloadable = true
 
 [libraries]
 
+macos.debug.arm64 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.macos.template_debug.arm64.dylib"
+macos.release.arm64 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.macos.template_release.arm64.dylib"
+macos.debug.x86_64 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.macos.template_debug.x86_64.dylib"
+macos.release.x86_64 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.macos.template_release.x86_64.dylib"
 windows.debug.x86_64 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.windows.template_debug.x86_64.dll"
 windows.release.x86_64 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.windows.template_release.x86_64.dll"
 web.debug.wasm32 = "res://native/non_zero_tessellator/bin/non_zero_path_tessellator.web.template_debug.wasm32.nothreads.wasm"

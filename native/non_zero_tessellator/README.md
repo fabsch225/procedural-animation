@@ -5,25 +5,25 @@ adaptive cubic-curve stroke tessellation in C++ through the official
 `godot-cpp` bindings. It supports the self-intersecting Processing-style body
 paths and the lizard's round-capped cubic limbs.
 
-## One-time requirements on Windows
+## One-time requirements on macOS
 
-- Visual Studio 2022 with **Desktop development with C++**
+- Xcode Command Line Tools
 - Python 3
 - SCons (`python -m pip install scons`)
 - Git
 
-The current development machine already has all four requirements.
+The build script uses the macOS `arm64` target by default. Pass `-Arch x86_64`
+when building on an Intel Mac.
 
 ## Build
 
-From PowerShell in this directory:
+From PowerShell (`pwsh`) in this directory:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
+pwsh -NoProfile -File ./build.ps1
 ```
 
-The execution-policy argument only applies to this PowerShell process; it does
-not change the machine's PowerShell policy. The first run clones the pinned
+The first run clones the pinned
 official `godot-cpp` release into this directory. That checkout is ignored by
 Git.
 
@@ -31,9 +31,12 @@ The first build downloads the pinned `godot-cpp` dependency. Later builds use
 the existing checkout. Build an optimized export library with:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build.ps1 `
+pwsh -NoProfile -File ./build.ps1 `
 	-Target template_release
 ```
+
+To build the Windows library from PowerShell, pass
+`-Platform windows -Arch x86_64`.
 
 The `.gdextension` resource loads the correct debug or release DLL from
 `bin/`. Godot discovers `.gdextension` resources automatically when the
